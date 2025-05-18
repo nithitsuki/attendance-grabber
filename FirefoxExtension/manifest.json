@@ -6,7 +6,11 @@
   "host_permissions": [
     "https://students.amrita.edu/*",
     "https://sad.nithitsuki.com/*",
-    "http://localhost:3000/*"
+    "*://localhost/*",
+    "http://127.0.0.1/*",
+    "https://127.0.0.1/*",
+    "http://*/*",
+    "https://*/*"
   ],
   "permissions": [
     "cookies",
@@ -15,21 +19,11 @@
     "storage",
     "tabs"
   ],
-  "background": {
-    "service_worker": "worker.js",
-    "type": "module"
-  },
   "action": {
     "default_popup": "popup.html",
     "default_title": "Amrita Attendance Fetcher"
   },
-  "web_accessible_resources": [
-    {
-      "resources": ["get_attendance_html.js", "attendance_to_json.js"],
-      "matches": ["<all_urls>"]
-    }
-  ],
-   "icons": {
+  "icons": {
     "16": "icon16.png",
     "32": "icon32.png",
     "48": "icon48.png",

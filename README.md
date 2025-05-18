@@ -13,7 +13,7 @@ A Chrome extension that enhances the attendance tracking experience for Amrita U
 
 1. Download the extension from the [Chrome Web Store](https://chrome.google.com/webstore)
 2. Click "Add to Chrome" to install
-3. Login to your university portal as usual
+3. 
 
 ## Usage
 
