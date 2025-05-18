@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Amrita Attendance Fetcher",
+  "version": "1.0",
+  "description": "Capture attendance data from Amrita University's student portal.",
+  "host_permissions": [
+    "https://students.amrita.edu/*",
+    "https://sad.nithitsuki.com/*",
+    "http://localhost:3000/*"
+  ],
+  "permissions": [
+    "cookies",
+    "webNavigation",
+    "scripting",
+    "storage",
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Amrita Attendance Fetcher"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["get_attendance_html.js", "attendance_to_json.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
