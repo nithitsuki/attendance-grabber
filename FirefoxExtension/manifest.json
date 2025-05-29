@@ -29,6 +29,13 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
+  "content_scripts": [{
+      "matches": ["https://students.amrita.edu/client/class-attendance*"],
+      "js": ["content-script.js"]
+    }],
+  "background": {
+    "scripts": ["worker.js"]
+  },
   "browser_specific_settings": {
   "gecko": {
     "id": "sad@nithitsuki.com",
