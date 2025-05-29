@@ -29,12 +29,19 @@
     "48": "icon48.png",
     "128": "icon128.png"
   },
-  "content_scripts": [{
+  "content_scripts": [
+    {
       "matches": ["https://students.amrita.edu/client/class-attendance*"],
-      "js": ["content-script.js"]
-    }],
+      "js": ["config.js", "content-script.js"]
+    },
+    {
+      "matches": ["http://localhost:3000/*", "http://localhost/*", "http://127.0.0.1:3000/*", "https://sad.nithitsuki.com/*"],
+      "js": ["config.js", "website-modifier.js"],
+      "run_at": "document_start"
+    }
+  ],
   "background": {
-    "scripts": ["worker.js"]
+    "scripts": ["config.js", "worker.js"]
   },
   "browser_specific_settings": {
   "gecko": {

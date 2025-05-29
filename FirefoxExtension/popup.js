@@ -1,6 +1,5 @@
-// Define the server URL as a constant
-// const TargetWebsite = "https://sad.nithitsuki.com";
-const TargetWebsite = "http://localhost:3000";
+// Define the server URL from global config
+const TargetWebsite = window.EXTENSION_CONFIG?.TARGET_WEBSITE || "http://localhost:3000";
 
 document.getElementById("dump").addEventListener("click", async () => {
     const output = document.getElementById("output");

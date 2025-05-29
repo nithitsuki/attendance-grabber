@@ -2,6 +2,15 @@ let windowId = null;
 
 console.log("Extension service worker started");
 
+// Import configuration - since this is a background script, CONFIG should be available globally
+const config = (typeof CONFIG !== 'undefined') ? CONFIG : {
+  TARGET_WEBSITE: "http://localhost:3000",
+  AMRITA_PORTAL: {
+    BASE_URL: "https://students.amrita.edu",
+    ATTENDANCE_PATH: "/client/class-attendance"
+  }
+};
+
 // Handle messages from content script and popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "getAttendance") {
@@ -26,7 +35,7 @@ async function handleGetAttendance(targetWebsite) {
       throw new Error("Cannot access tab details. Please ensure a page is active and try again.");
     }
 
-    const targetUrl = 'https://students.amrita.edu/client/class-attendance';
+    const targetUrl = config.AMRITA_PORTAL.BASE_URL + config.AMRITA_PORTAL.ATTENDANCE_PATH;
     
     // Check if we need to navigate to the attendance page
     if (!tab.url.startsWith(targetUrl)) {
@@ -40,6 +49,16 @@ async function handleGetAttendance(targetWebsite) {
       target: { tabId: tab.id },
       func: extractAttendanceDataFromPage
     });
+    try {
+      const usernameResponse = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: extractUsername
+      });
+      username = usernameResponse[0]?.result || "Unknown User";
+    } catch (error) {
+      console.error('Failed to extract username:', error);
+      username = "Unknown User";
+    }
 
     if (!results || !results[0] || !results[0].result) {
       throw new Error("Could not extract attendance data. No results from script.");
@@ -59,7 +78,7 @@ async function handleGetAttendance(targetWebsite) {
     
     // Transfer data to target website if specified
     if (targetWebsite) {
-      await transferDataToWebsite(tab.id, targetWebsite, JSON.stringify(attendanceData, null, 2));
+      await transferDataToWebsite(tab.id, targetWebsite, JSON.stringify(attendanceData, null, 2), username);
     }
     
     return attendanceData;
@@ -145,9 +164,25 @@ function extractAttendanceDataFromPage() {
   return records;
 }
 
-async function transferDataToWebsite(tabId, targetWebsite, attendanceData) {
+function extractUsername() {
+  const userInfoElement = document.querySelector('.user-info');
+  if (!userInfoElement) {
+    return "Could not find user info element on the page.";
+  }
+
+  const userInfoText = userInfoElement.textContent.trim();
+  // Extract name by removing icons and extra whitespace
+  const nameMatch = userInfoText.match(/[A-Z][A-Z\s]+$/);
+  if (!nameMatch) {
+    return "Could not extract username from user info.";
+  }
+
+  return nameMatch[0].trim();
+}
+
+async function transferDataToWebsite(tabId, targetWebsite, attendanceData, username) {
   // Save the attendance data first
-  await chrome.storage.local.set({ 'subjectsData': attendanceData });
+  await chrome.storage.local.set({ 'subjectsData': attendanceData, 'username': username });
   console.log('Attendance data saved temporarily');
   
   // Navigate to the target website
@@ -167,6 +202,12 @@ async function transferDataToWebsite(tabId, targetWebsite, attendanceData) {
           console.log('Subjects data saved to localStorage');
         }
       });
+      chrome.storage.local.get(['username'], function(result) {
+        if (result.username) {
+          localStorage.setItem('username', result.username);
+          console.log('Username saved to localStorage');
+        }
+      });
     }
   });
 
@@ -180,60 +221,4 @@ async function transferDataToWebsite(tabId, targetWebsite, attendanceData) {
       }
     });
   }, 1000);
-}
-
-async function openLoginPopup() {
-  console.log("openLoginPopup called");
-
-  try {
-    const win = await chrome.windows.create({
-      url: 'https://students.amrita.edu',
-      type: 'popup',
-      width: 400,
-      height: 600
-    });
-
-    windowId = win.id;
-    const tabId = win.tabs?.[0]?.id;
-
-    if (!tabId) {
-      throw new Error("No tab created in popup window");
-    }
-
-    const navListener = async (details) => {
-      if (details.tabId === tabId && 
-          details.url.startsWith('https://my.amrita.edu/index/index')) {
-        
-        chrome.webNavigation.onCompleted.removeListener(navListener);
-
-        try {
-          const cookie = await chrome.cookies.get({
-            url: 'https://students.amrita.edu',
-            name: 'PHPSESSID'
-          });
-
-          if (cookie) {
-            console.log("Got PHPSESSID:", cookie.value);
-            setTimeout(() => {
-              if (windowId) {
-                chrome.windows.remove(windowId);
-                windowId = null;
-              }
-            }, 2000);
-          } else {
-            console.warn("PHPSESSID not found");
-          }
-        } catch (error) {
-          console.error("Error getting cookie:", error);
-        }
-      }
-    };
-
-    chrome.webNavigation.onCompleted.addListener(navListener, {
-      url: [{urlPrefix: 'https://my.amrita.edu/index/index'}]
-    });
-
-  } catch (error) {
-    console.error("Error creating window:", error);
-  }
 }
