@@ -1,6 +1,6 @@
 // Define the server URL as a constant
-const TargetWebsite = "https://sad.nithitsuki.com";
-// const TargetWebsite = "http://localhost:3000";
+// const TargetWebsite = "https://sad.nithitsuki.com";
+const TargetWebsite = "http://localhost:3000";
 
 // This function will be injected into the target page.
 // It cannot use any variables or functions from the popup.js scope directly.
@@ -31,16 +31,25 @@ function extractAttendanceDataFromPage() {
             return;
         }
 
+        let dutyLeave = parseInt(columns[6].textContent.trim()) || 0;
+        let medicalLeave = parseInt(columns[9] ? columns[9].textContent.trim() : 0) || 0;
+        let totalPresent = parseInt(columns[5].textContent.trim()) + dutyLeave + medicalLeave;
+        let CourseCleaned = columns[2].innerHTML.replace(/.*<br>/, '');
+        let CourseAbbreviation = CourseCleaned.split(' ')
+            .filter(word => /^[a-zA-Z]/.test(word) && !['to', 'and', 'of'].includes(word.toLowerCase()))
+            .map(word => word[0].toUpperCase())
+            .join('.');
+
         const record = {
             Sl_No: columns[0].textContent.trim(),
-            Course: columns[2].textContent.trim().replace(/\\n|\\r/g, ' ').trim(),
-            faculty: columns[3].textContent.trim(),
-            total: columns[4].textContent.trim(),
-            present: columns[5].textContent.trim(),
-            dutyLeave: columns[6].textContent.trim(),
-            absent: columns[7].textContent.trim(),
-            percentage: columns[8].textContent.trim(),
-            medical: columns[9] ? columns[9].textContent.trim() : "" // Handle if medical column doesn't exist
+            Course: CourseCleaned,
+            CourseAbbreviation: CourseAbbreviation,
+            // faculty: columns[3].textContent.trim(),
+            total: parseInt(columns[4].textContent.trim()) || 0,
+            present: totalPresent,
+            absent: parseInt(columns[7].textContent.trim()) || 0,
+            percentage: parseFloat(columns[8].textContent.trim()) || 0,
+            MinAttendancePercentage: 75,
         };
         records.push(record);
     });
@@ -137,32 +146,32 @@ document.getElementById("dump").addEventListener("click", () => {
         };
 
         // Check if the tab is already on the target URL
-        if (tab.url === targetUrl) {
+        if (tab.url.startsWith(targetUrl)) {
             // Before executing, ensure the page is likely fully loaded, especially if it was just navigated to.
             // For simplicity here, if already on URL, assume it's ready.
             // A more robust solution might check document.readyState via a quick script injection first.
             if (tab.status === 'complete') {
-                executeExtraction(tab.id);
+            executeExtraction(tab.id);
             } else {
-                // If not complete, listen for it to complete
-                output.textContent = "Page is still loading. Waiting for completion...";
-                const preloadedTabListener = (tabId, changeInfo) => {
-                    if (tabId === tab.id && changeInfo.status === 'complete') {
-                        chrome.tabs.onUpdated.removeListener(preloadedTabListener);
-                        executeExtraction(tabId);
-                    }
-                };
-                chrome.tabs.onUpdated.addListener(preloadedTabListener);
+            // If not complete, listen for it to complete
+            output.textContent = "Page is still loading. Waiting for completion...";
+            const preloadedTabListener = (tabId, changeInfo) => {
+                if (tabId === tab.id && changeInfo.status === 'complete') {
+                chrome.tabs.onUpdated.removeListener(preloadedTabListener);
+                executeExtraction(tabId);
+                }
+            };
+            chrome.tabs.onUpdated.addListener(preloadedTabListener);
             }
         } else {
             // Navigate to the page and then extract
             output.textContent = "Navigating to attendance page...";
             const navigationListener = (tabId, changeInfo, updatedTab) => {
-                // Ensure we're listening for the correct tab and it has finished loading the target URLz
-                if (tabId === tab.id && changeInfo.status === 'complete' && updatedTab.url === targetUrl) {
-                    chrome.tabs.onUpdated.removeListener(navigationListener); // Clean up listener
-                    executeExtraction(tabId);
-                }
+            // Ensure we're listening for the correct tab and it has finished loading the target URL
+            if (tabId === tab.id && changeInfo.status === 'complete' && updatedTab.url.startsWith(targetUrl)) {
+                chrome.tabs.onUpdated.removeListener(navigationListener); // Clean up listener
+                executeExtraction(tabId);
+            }
             };
             chrome.tabs.onUpdated.addListener(navigationListener);
             chrome.tabs.update(tab.id, { url: targetUrl });

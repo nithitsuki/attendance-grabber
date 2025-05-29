@@ -1,6 +1,7 @@
 # Amrita Attendance Fetcher
 
-A Chrome extension that enhances the attendance tracking experience for Amrita University students.
+An extension that enhances the attendance tracking experience for Amrita University students.
+
 
 ## Features
 
