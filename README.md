@@ -8,26 +8,26 @@ A modern browser extension that streamlines attendance tracking for Amrita Unive
 ![Edge Store](https://img.shields.io/badge/Edge-Under%20Review-yellow.svg)
 ![Chrome Store](https://img.shields.io/badge/Chrome-Sponsor%20Needed-red.svg)
 
-## 🚀 Usage
-
 ## 📦 Installation
 
-### 🦊 Firefox + Android
+###  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firefox/firefox-original.svg" height=23 width=23 /> Firefox + Android
 click on the button below to install the extension directly from the Firefox Add-ons store:
 <a href="https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/" target="_blank">     
-<img src="marketing/firefoxget.gif" alt="firefoxget" height="31" width="88">
+[<img src="marketing/firefoxget.gif" alt="firefoxget" height="31" width="88">](https://github.com/nithitsuki/attendance-grabber/blob/18dd790ad5ff1bf910a0e01d03c4a95ebb6d5ae8/marketing/firefoxget.gif)
 </a>
 or [click here](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/) to visit the Firefox Add-ons page.
 
 
-### 🌐 Edge (Under Review)
-
+### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ie10/ie10-original.svg" height=21 width=21 /> Edge (Under Review)
+          
 Currently under Microsoft Store review. Expected approval within 7 business days.
 
-### 🔍 Chrome (Sponsorship Needed)
+### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/chrome/chrome-original.svg"  height=21 width=21/> Chrome (Sponsorship Needed)
+
 
 Chrome Web Store publication requires a $5 developer fee. Since I don't personally use Chrome, I haven't paid this fee yet. However, if you'd like to help make this extension available on Chrome, feel free to sponsor the project via [GitHub Sponsors](https://github.com/sponsors/nithitsuki)
 
+## 🚀 Usage
 ### Quick Start
 1. **Pin the extension** to your browser toolbar (recommended for easy access)
 2. **Option A - Use Extension Popup**:
