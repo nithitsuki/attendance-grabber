@@ -13,7 +13,7 @@ A modern browser extension that streamlines attendance tracking for Amrita Unive
 ###  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firefox/firefox-original.svg" height=23 width=23 /> Firefox + Android
 click on the button below to install the extension directly from the Firefox Add-ons store:
 <a href="https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/" target="_blank">     
-[<img src="marketing/firefoxget.gif" alt="firefoxget" height="31" width="88">](https://github.com/nithitsuki/attendance-grabber/blob/18dd790ad5ff1bf910a0e01d03c4a95ebb6d5ae8/marketing/firefoxget.gif)
+[<img src="marketing/firefoxget.gif" alt="firefoxget" height="31" width="88">](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/)
 </a>
 or [click here](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/) to visit the Firefox Add-ons page.
 
