@@ -132,8 +132,26 @@ async function injectDataToLocalStorage(tabId: number): Promise<void> {
             func: (data: StorageData) => {
                 try {
                     if (data.subjectsData) {
-                        localStorage.setItem('subjectsData', data.subjectsData);
-                        console.log('Subjects data saved to localStorage');
+                        const existingDataString = localStorage.getItem('subjectsData');
+                        const existingSubjects = existingDataString ? JSON.parse(existingDataString) : [];
+                        const newSubjects = JSON.parse(data.subjectsData);
+
+                        const subjectsMap = new Map(existingSubjects.map((s: any) => [s.Course, s]));
+
+                        for (const newSubject of newSubjects) {
+                            const existingSubject = subjectsMap.get(newSubject.Course) as typeof newSubject | undefined;
+                            const mergedSubject = { 
+                                ...(existingSubject ?? {}), 
+                                ...newSubject, 
+                                CourseAbbreviation: (existingSubject?.CourseAbbreviation) ?? newSubject.CourseAbbreviation 
+                            };
+                            subjectsMap.set(newSubject.Course, mergedSubject);
+                        }
+
+                        const updatedSubjects = Array.from(subjectsMap.values());
+
+                        localStorage.setItem('subjectsData', JSON.stringify(updatedSubjects));
+                        console.log('Subjects data updated in localStorage');
                     }
                     if (data.username) {
                         localStorage.setItem('username', data.username);
