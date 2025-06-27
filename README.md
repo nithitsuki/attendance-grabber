@@ -15,17 +15,20 @@ click on the button below to install the extension directly from the Firefox Add
 <a href="https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/" target="_blank">     
 [<img src="marketing/firefoxget.gif" alt="firefoxget" height="31" width="88">](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/)
 </a>
-or [click here](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/) to visit the Firefox Add-ons page.
+or [click here](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/)
 
-
-### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ie10/ie10-original.svg" height=21 width=21 /> Edge (Under Review)
-          
-Currently under Microsoft Store review. Expected approval within 7 business days.
+### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/ie10/ie10-original.svg" height=21 width=21 /> Edge
+Get it from the official [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/amrita-attendance-fetcher/eeccbjbcoakpcknafgkaopfhlhckknnm). Good luck with your edging experience!
 
 ### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/chrome/chrome-original.svg"  height=21 width=21/> Chrome (Sponsorship Needed)
 
-
 Chrome Web Store publication requires a $5 developer fee. Since I don't personally use Chrome, I haven't paid this fee yet. However, if you'd like to help make this extension available on Chrome, feel free to sponsor the project via [GitHub Sponsors](https://github.com/sponsors/nithitsuki)
+
+
+### <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opera/opera-original.svg" height=21 width=21 /> Opera
+`Publication status: — ` - the portal\
+The dev portal is horrible, I have no clue if it will even get published.\
+If you have published through this chinese dev portal before, [open an issue](https://github.com/nithitsuki/attendance-grabber/issues/new).
 
 ## 🚀 Usage
 ### Quick Start
