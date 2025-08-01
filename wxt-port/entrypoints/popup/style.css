@@ -29,15 +29,20 @@
         background-color: #8b0a32;
       }
 
-      pre {
-        min-width: 200px;
-        min-height: 0px;
-        overflow: auto;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        margin-top: 15px;
-        font-size: 12px;
-        line-height: 1.4;
-      }
+        pre {
+          min-width: 200px;
+          min-height: 0px;
+          overflow: auto;
+          padding: 15px;
+          background-color: #f8f9fa;
+          border: 1px solid #e9ecef;
+          border-radius: 6px;
+          margin-top: 15px;
+          font-size: 12px;
+          line-height: 1.4;
+          display: none;
+        }
+
+        pre:not(:empty) {
+          display: block;
+        }

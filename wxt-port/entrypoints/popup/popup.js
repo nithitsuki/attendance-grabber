@@ -6,6 +6,25 @@
 import { CONFIG } from '../../utils/config.js';
 import { extractAttendanceData, extractUsername } from '../../utils/attendance-extractor.js';
 import { transferDataToWebsite } from '../../utils/data-transfer';
+import { getTargetWebsite } from './popup-ui.js';
+
+/**
+ * Get target website with fallback
+ */
+async function getTargetWebsiteWithFallback() {
+  try {
+    // Try to use the imported function first
+    return await getTargetWebsite();
+  } catch (error) {
+    console.warn('Module import failed, trying global fallback:', error);
+    // Fallback to global window object if module import fails
+    if (window.popupUI && window.popupUI.getTargetWebsite) {
+      return await window.popupUI.getTargetWebsite();
+    }
+    // Final fallback to default
+    return "https://sad.nithitsuki.com";
+  }
+}
 
 // Handle navigation to Amrita student portal
 document.addEventListener('DOMContentLoaded', function () {
@@ -36,7 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
           updateOutput("username: " + JSON.stringify(username, null, 2) + "\n");
           updateOutput("subjectsData: " + JSON.stringify(result.result.data, null, 2));
 
-          transferDataToWebsite(tab.id, CONFIG.TARGET_WEBSITE, JSON.stringify(result.result.data, null, 2), username);
+          const targetWebsite = await getTargetWebsiteWithFallback();
+          transferDataToWebsite(tab.id, targetWebsite, JSON.stringify(result.result.data, null, 2), username);
 
         } else {
           // Navigate to the portal URL
@@ -111,7 +131,8 @@ document.addEventListener('DOMContentLoaded', function () {
         updateOutput("username: " + JSON.stringify(username, null, 2) + "\n");
         updateOutput("subjectsData: " + JSON.stringify(result.result.data, null, 2));
 
-        transferDataToWebsite(finalTab.id, CONFIG.TARGET_WEBSITE, JSON.stringify(result.result.data, null, 2), username);
+        const targetWebsite = await getTargetWebsiteWithFallback();
+        transferDataToWebsite(finalTab.id, targetWebsite, JSON.stringify(result.result.data, null, 2), username);
 
           } catch (error) {
         updateOutput('Error extracting attendance: ' + error.message);

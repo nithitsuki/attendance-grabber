@@ -1,13 +1,31 @@
 <!DOCTYPE html>
 <html style="background: #fff; border-radius: 1rem; color: #000;">
-  <head>
-    <title>Amrita Attendance Fetcher</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <h3>Amrita Attendance Fetcher</h3>
-    <button id="dump">Get Attendance</button>
-    <pre id="output" style="min-height: 0;"></pre>
-    <script type="module" src="popup.js"></script>
-  </body>
+
+<head>
+  <title>Amrita Attendance Fetcher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h3>Amrita Attendance Fetcher</h3>
+  <button id="dump">Get Attendance</button>
+  <pre id="output" style="min-height: 0;"></pre>
+  
+  <button id="override" style="display: none; background: black; color: white;">Enter God Mode</button>
+  
+  <div id="overrideOptions" style="display: none;">
+    <label>
+      Forward to localhost instead of sad.nithitsuki.com:
+      <input type="checkbox" id="localhostOverride">
+    </label>
+    <p>Sowwyyy! The real god mode hasnt been implemented yet (⌒_⌒;)</p>
+  </div>
+  
+  <p style="margin: 0; padding: 0;">perform the secret ritual to unseal the override protocol</p>
+  <p style="color: #fefefe; margin: 0; padding: 0;">up,up,down,down... the ancient code still holds.</p>
+
+  <script type="module" src="popup-ui.js"></script>
+  <script type="module" src="popup.js"></script>
+</body>
+
 </html>
