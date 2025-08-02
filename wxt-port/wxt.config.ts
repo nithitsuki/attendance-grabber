@@ -5,7 +5,7 @@ export default defineConfig({
   manifest: {
     name: "Amrita Attendance Fetcher",
     description: "Capture attendance data from Amrita University's student portal.",
-    version: "3.0.0",
+    version: "3.5.0",
     permissions: [
       "tabs",
       "cookies", 
