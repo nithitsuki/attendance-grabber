@@ -4,7 +4,7 @@
  * Refactored to use WXT API patterns
  */
 
-import { AttendanceRecord } from './attendance-extractor';
+import { AttendanceRecord, ATTENDANCE_SCHEMA_VERSION } from './attendance-extractor';
 
 interface StorageData {
   subjectsData?: string;
@@ -116,7 +116,7 @@ async function waitForPageLoad(tabId: number, expectedUrl: string): Promise<void
 }
 
 /**
- * Injects script to transfer data from extension storage to localStorage
+ * Injects script to transfer data and app settings from extension storage to localStorage
  * @param tabId Current tab ID
  */
 async function injectDataToLocalStorage(tabId: number): Promise<void> {
@@ -129,12 +129,35 @@ async function injectDataToLocalStorage(tabId: number): Promise<void> {
         // Then inject the data into the page
         await browser.scripting.executeScript({
             target: { tabId: tabId },
-            func: (data: StorageData) => {
+            func: (data: StorageData, currentSchemaVersion: number) => {
                 try {
                     if (data.subjectsData) {
                         const existingDataString = localStorage.getItem('subjectsData');
-                        const existingSubjects = existingDataString ? JSON.parse(existingDataString) : [];
+                        let existingSubjects = existingDataString ? JSON.parse(existingDataString) : [];
                         const newSubjects = JSON.parse(data.subjectsData);
+
+                        // Check schema version and perform migration if needed
+                        const existingSchemaVersion = existingSubjects.length > 0 ? 
+                            (existingSubjects[0].schemaVersion || 1) : currentSchemaVersion;
+
+                        console.log('Schema version check:', {
+                            existing: existingSchemaVersion,
+                            current: currentSchemaVersion
+                        });
+
+                        // If schema version is outdated, clear existing data
+                        if (existingSchemaVersion < currentSchemaVersion) {
+                            console.log('⚠️ Schema version outdated. Clearing old subjects data.');
+                            console.log(`Migrating from schema v${existingSchemaVersion} to v${currentSchemaVersion}`);
+                            existingSubjects = []; // Clear old data
+                            
+                            // Store migration info for user notification
+                            localStorage.setItem('schemaMigration', JSON.stringify({
+                                from: existingSchemaVersion,
+                                to: currentSchemaVersion,
+                                timestamp: Date.now()
+                            }));
+                        }
 
                         const subjectsMap = new Map(existingSubjects.map((s: any) => [s.Course, s]));
 
@@ -143,7 +166,8 @@ async function injectDataToLocalStorage(tabId: number): Promise<void> {
                             const mergedSubject = { 
                                 ...(existingSubject ?? {}), 
                                 ...newSubject, 
-                                CourseAbbreviation: (existingSubject?.CourseAbbreviation) ?? newSubject.CourseAbbreviation 
+                                CourseAbbreviation: (existingSubject?.CourseAbbreviation) ?? newSubject.CourseAbbreviation,
+                                schemaVersion: currentSchemaVersion // Ensure all records have current schema version
                             };
                             subjectsMap.set(newSubject.Course, mergedSubject);
                         }
@@ -157,11 +181,43 @@ async function injectDataToLocalStorage(tabId: number): Promise<void> {
                         localStorage.setItem('username', data.username);
                         console.log('Username saved to localStorage');
                     }
+                    
+                    // Update app settings to customize the website
+                    const username = data.username || 'Amrita User';
+                    const formattedUsername = username.replace(/\w\S*/g, (word: string) => 
+                        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+                    );
+                    const customTitle = `Welcome ${formattedUsername}! Click to update attendance.`;
+                    
+                    // Get existing app settings
+                    const existingSettingsString = localStorage.getItem('appSettings');
+                    const existingSettings = existingSettingsString ? JSON.parse(existingSettingsString) : {};
+                    
+                    // Update settings with our custom values
+                    const updatedSettings = {
+                        ...existingSettings,
+                        showAddSubjects: false, // Hide the add subjects button
+                        titlePayload: customTitle // Set custom title
+                    };
+                    
+                    localStorage.setItem('appSettings', JSON.stringify(updatedSettings));
+                    console.log('App settings updated in localStorage:', updatedSettings);
+                    
+                    // Trigger events to notify the website of changes
+                    window.dispatchEvent(new CustomEvent('appSettingsUpdated', {
+                        detail: { source: 'extension' }
+                    }));
+                    
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'appSettings',
+                        newValue: JSON.stringify(updatedSettings),
+                        storageArea: localStorage
+                    }));
                 } catch (error) {
                     console.error('Failed to set localStorage:', error);
                 }
             },
-            args: [storageData as StorageData]
+            args: [storageData as StorageData, ATTENDANCE_SCHEMA_VERSION]
         });
         console.log('Data injection completed');
     } catch (error) {

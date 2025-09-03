@@ -22,7 +22,7 @@ async function getTargetWebsiteWithFallback() {
       return await window.popupUI.getTargetWebsite();
     }
     // Final fallback to default
-    return "https://sad.nithitsuki.com";
+    return "https://sad.nithitsuki.com/dashboard";
   }
 }
 

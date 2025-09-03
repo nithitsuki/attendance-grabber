@@ -45,13 +45,13 @@ async function getTargetWebsite() {
     const useLocalhost = result.localhostOverride || false;
     
     if (useLocalhost) {
-      return "http://localhost:3000";
+      return "http://localhost:3000/dashboard";
     } else {
-      return "https://sad.nithitsuki.com";
+      return "https://sad.nithitsuki.com/dashboard";
     }
   } catch (error) {
     console.error('Error getting target website:', error);
-    return "https://sad.nithitsuki.com"; // fallback to default
+    return "https://sad.nithitsuki.com/dashboard"; // fallback to default
   }
 }
 

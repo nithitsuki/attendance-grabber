@@ -38,46 +38,157 @@ export default defineBackground(() => {
 
   /**
    * Main handler for attendance extraction requests
-   * Coordinates the entire process from extraction to data transfer
+   * Implements the exact same logic as the popup dump button
    * @param targetWebsite Optional target website URL for data transfer
    * @returns Promise resolving to attendance data
    */
   async function handleGetAttendance(targetWebsite?: string) {
-    console.log("Processing attendance extraction request...");
+    console.log("🎯 Processing attendance extraction request (popup dump button logic)...");
     
     try {
-      // TODO: Implement complete attendance extraction flow
-      // 1. Get current active tab
-      // 2. Check if we're on the attendance page, navigate if needed
-      // 3. Extract attendance data from the page
-      // 4. Extract username from the page
-      // 5. Transfer data to target website if specified
-      // 6. Return processed attendance data
+      // Step 1: Get the active tab (same as popup)
+      const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
       
-      const tabs = await getCurrentActiveTab();
-      const currentTab = tabs[0];
-      
-      if (!currentTab?.id || !currentTab.url) {
+      if (!tab?.id || !tab.url) {
         throw new Error("Cannot access current tab. Please ensure a page is active.");
       }
 
-      await ensureOnAttendancePage(currentTab.id, currentTab.url);
-      const attendanceData = await extractAttendanceFromPage(currentTab.id);
-      const username = await extractUsernameFromPage(currentTab.id);
-      
-      if (targetWebsite) {
-        await transferDataToWebsite(
-          currentTab.id, 
-          targetWebsite, 
-          JSON.stringify(attendanceData, null, 2), 
-          username
-        );
+      const portalUrl = String(CONFIG.AMRITA_PORTAL.BASE_URL + CONFIG.AMRITA_PORTAL.ATTENDANCE_PATH);
+      console.log("🌐 Portal URL:", portalUrl);
+      console.log("📍 Current tab URL:", tab.url);
+
+      // Step 2: Check if current tab is on the portal URL (same as popup)
+      if (tab.url && tab.url.includes(portalUrl)) {
+        console.log("✅ Already on attendance page, extracting data...");
+        
+        const [result] = await browser.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: extractAttendanceData
+        });
+        
+        const [usernameResult] = await browser.scripting.executeScript({
+          target: { tabId: tab.id },
+          func: extractUsername
+        });
+        
+        const username = usernameResult?.result || 'Unknown';
+        const attendanceData = result?.result?.data || [];
+        
+        console.log("👤 Username:", username);
+        console.log("📊 Subjects data:", JSON.stringify(attendanceData, null, 2));
+
+        // Transfer data to target website if specified
+        if (targetWebsite) {
+          await transferDataToWebsite(tab.id, targetWebsite, JSON.stringify(attendanceData, null, 2), username);
+        }
+
+        return {
+          attendanceData: attendanceData,
+          username: username,
+          message: 'Data extracted successfully from attendance page'
+        };
+        
+      } else {
+        console.log("🚀 Not on attendance page, navigating...");
+        
+        // Navigate to the portal URL (same as popup)
+        await browser.tabs.update(tab.id, { url: portalUrl });
+        
+        // Wait for the tab to actually load (same as popup)
+        await new Promise((resolve) => {
+          const checkLoaded = () => {
+            if (tab.id) {
+              browser.tabs.get(tab.id).then((updatedTab) => {
+                if (updatedTab.status === 'complete') {
+                  resolve(undefined);
+                } else {
+                  setTimeout(checkLoaded, 100);
+                }
+              });
+            }
+          };
+          checkLoaded();
+        });
+
+        // Get updated tab info after navigation
+        const [updatedTab] = await browser.tabs.query({ active: true, currentWindow: true });
+
+        // Check if we're at the login page (same as popup)
+        if (updatedTab && updatedTab.url && !updatedTab.url.includes(portalUrl)) {
+          // Click the submit button
+          if (updatedTab.id) {
+            await browser.scripting.executeScript({
+              target: { tabId: updatedTab.id },
+              func: () => {
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                  submitBtn.click();
+                }
+              }
+            });
+            console.log('🔐 Login page detected, clicked submit button');
+          }
+        }
+
+        console.log('⏳ Waiting for user to complete login and navigate to attendance page...');
+        
+        // Wait for user to reach the portal URL (same as popup)
+        const waitForPortalUrl = () => {
+          return new Promise((resolve) => {
+            const checkUrl = async () => {
+              try {
+                const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
+                if (currentTab.url && currentTab.url.includes(portalUrl)) {
+                  resolve(currentTab);
+                } else {
+                  setTimeout(checkUrl, 1000); // Check every second
+                }
+              } catch (error) {
+                setTimeout(checkUrl, 1000);
+              }
+            };
+            checkUrl();
+          });
+        };
+
+        try {
+          const finalTab: any = await waitForPortalUrl();
+          
+          // Extract data from the final page
+          const [result] = await browser.scripting.executeScript({
+            target: { tabId: finalTab.id },
+            func: extractAttendanceData
+          });
+          
+          const [usernameResult] = await browser.scripting.executeScript({
+            target: { tabId: finalTab.id },
+            func: extractUsername
+          });
+          
+          const username = usernameResult?.result || 'Unknown';
+          const attendanceData = result?.result?.data || [];
+          
+          console.log("👤 Username:", username);
+          console.log("📊 Subjects data:", JSON.stringify(attendanceData, null, 2));
+
+          // Transfer data to target website if specified
+          if (targetWebsite) {
+            await transferDataToWebsite(finalTab.id, targetWebsite, JSON.stringify(attendanceData, null, 2), username);
+          }
+
+          return {
+            attendanceData: attendanceData,
+            username: username,
+            message: 'Data extracted successfully after navigation and login'
+          };
+          
+        } catch (error: any) {
+          throw new Error('Failed to extract attendance after navigation: ' + (error?.message || 'Unknown error'));
+        }
       }
       
-      return attendanceData;
-      
     } catch (error) {
-      console.error("Error in handleGetAttendance:", error);
+      console.error("❌ Error in handleGetAttendance:", error);
       throw error;
     }
   }
