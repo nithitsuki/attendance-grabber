@@ -15,11 +15,28 @@
   <button id="override" style="display: none; background: black; color: white;">Enter God Mode</button>
   
   <div id="overrideOptions" style="display: none;">
-    <label>
-      Forward to localhost instead of sad.nithitsuki.com:
+    <h4 style="margin: 10px 0 5px 0;">⚙️ Settings</h4>
+    <label style="display: block; margin: 5px 0;">
       <input type="checkbox" id="localhostOverride">
+      Use custom URL instead of sad.nithitsuki.com
     </label>
-    <p>Sowwyyy! The real god mode hasnt been implemented yet (⌒_⌒;)</p>
+    <div style="margin: 5px 0 5px 20px;">
+      <label style="display: block; font-size: 12px;">
+        Custom URL:
+        <input type="text" id="customUrl" placeholder="http://localhost:3000/dashboard" style="width: 250px; padding: 2px;">
+      </label>
+    </div>
+    <label style="display: block; margin: 5px 0;">
+      <input type="checkbox" id="godModeAutoEnable">
+      Enable God Mode by default
+    </label>
+    
+    <h4 style="margin: 15px 0 5px 0;">Debug Tools</h4>
+    <button id="debugCheckUsername" style="margin: 5px 0; padding: 5px 10px;">Check Current Username</button>
+    <button id="debugFetchUsername" style="margin: 5px 0; padding: 5px 10px;">Fetch Username from Portal</button>
+    <button id="debugResolveUsername" style="margin: 5px 0; padding: 5px 10px;">Resolve Username</button>
+    <button id="debugClearUsername" style="margin: 5px 0; padding: 5px 10px; background: #ff6b6b; color: white;">Reset Username to "Unknown User"</button>
+    <pre id="debugOutput" style="margin: 5px 0; padding: 5px; background: #f0f0f0; max-height: 200px; overflow-y: auto; font-size: 11px;"></pre>
   </div>
   
   <p style="margin: 0; padding: 0;">perform the secret ritual to unseal the override protocol</p>
