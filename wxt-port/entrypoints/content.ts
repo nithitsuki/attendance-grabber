@@ -7,15 +7,19 @@ import { initLogger } from '../utils/logger';
 
 export default defineContentScript({
   matches: [
-    'https://students.amrita.edu/client/class-attendance*',
-    'http://localhost:3000/*',
+    'https://students.amrita.edu/*',
     'http://localhost/*', 
-    'http://127.0.0.1:3000/*',
+    'http://127.0.0.1/*',
     'https://sad.nithitsuki.com/*'
   ],
   async main() {
     await initLogger();
     setupMessageListener();
+    
+    // Auto-fetch username on Amrita portal if needed
+    if (window.location.hostname.includes('students.amrita.edu')) {
+      autoFetchUsername();
+    }
     
     if (window.location.href.includes('students.amrita.edu/client/class-attendance')) {
       initializeAttendancePage();
@@ -49,27 +53,69 @@ async function initializeWebsiteModifier() {
 }
 
 /**
+ * Automatically fetch and save username from portal if not already set
+ */
+async function autoFetchUsername() {
+  try {
+    const { getRawUsername, resolveUsername } = await import('./content/user-utils');
+    const currentUsername = await getRawUsername();
+    
+    // Only auto-fetch if username is unknown or unset
+    if (currentUsername === 'Unknown User' || !currentUsername) {
+      const logger = await import('../utils/logger');
+      logger.log('Auto-fetching username from portal...');
+      await resolveUsername(); // This will fetch and save automatically
+    }
+  } catch (error) {
+    (await import('../utils/logger')).error('Failed to auto-fetch username:', error);
+  }
+}
+
+/**
  * Message listener for debug commands from popup
  */
 function setupMessageListener() {
-  browser.runtime.onMessage.addListener(async (message) => {
-    const { getRawUsername, fetchUsernameFromAmritaPortal, resolveUsername, saveUsername } = 
-      await import('./content/user-utils');
+  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Handle async operations properly for Chrome compatibility
+    (async () => {
+      try {
+        const { getRawUsername, fetchUsernameFromAmritaPortal, resolveUsername, saveUsername } = 
+          await import('./content/user-utils');
+        
+        switch (message.action) {
+          case 'debugCheckUsername':
+            const raw = await getRawUsername();
+            sendResponse({ raw, isUnknown: raw === 'Unknown User' });
+            break;
+          
+          case 'debugFetchUsername':
+            const fetchResult = await fetchUsernameFromAmritaPortal();
+            if (fetchResult) {
+              await saveUsername(fetchResult);
+            }
+            sendResponse({ result: fetchResult });
+            break;
+          
+          case 'debugResolveUsername':
+            const resolvedUsername = await resolveUsername();
+            sendResponse({ result: resolvedUsername });
+            break;
+          
+          case 'debugClearUsername':
+            await saveUsername('Unknown User');
+            const clearedUsername = await getRawUsername();
+            sendResponse({ result: clearedUsername });
+            break;
+          
+          default:
+            sendResponse(undefined);
+        }
+      } catch (error) {
+        sendResponse({ error: error.message });
+      }
+    })();
     
-    switch (message.action) {
-      case 'debugCheckUsername':
-        const raw = getRawUsername();
-        return { raw, isUnknown: raw === 'Unknown User' };
-      
-      case 'debugFetchUsername':
-        return { result: await fetchUsernameFromAmritaPortal() };
-      
-      case 'debugResolveUsername':
-        return { result: await resolveUsername() };
-      
-      case 'debugClearUsername':
-        saveUsername('Unknown User');
-        return { result: getRawUsername() };
-    }
+    // Return true to indicate async response
+    return true;
   });
 }

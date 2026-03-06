@@ -5,9 +5,9 @@ export default defineConfig({
   manifest: {
     name: "Amrita Attendance Fetcher",
     description: "Capture attendance data from Amrita University's student portal.",
-    version: "5.0",
+    version: "6.0",
     permissions: [
-      "tabs",
+      "activeTab",
       "cookies", 
       "webNavigation",
       "scripting",
@@ -19,8 +19,6 @@ export default defineConfig({
       "*://localhost/*",
       "http://127.0.0.1/*",
       "https://127.0.0.1/*",
-      "http://*/*",
-      "https://*/*"
     ],
     action: {
       default_title: "Amrita Attendance Fetcher"
@@ -30,6 +28,14 @@ export default defineConfig({
       32: "/icon/32.png", 
       48: "/icon/48.png",
       128: "/icon/128.png"
+    },
+    browser_specific_settings: {
+      gecko: {
+        id: "sad@nithitsuki.com",
+        data_collection_permissions: {
+        required: ["none"]
+        }
+      }
     }
   }
 });

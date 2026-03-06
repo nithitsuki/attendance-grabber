@@ -1,6 +1,6 @@
       body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        padding: 20px;
+        padding: 15px 20px 20px 20px;
         margin: 0;
         min-width: 300px;
         background: #fff;
@@ -8,9 +8,102 @@
         transition: background-color 0.3s, color 0.3s;
       }
 
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 5px;
+      }
+
+      .title-section {
+        flex: 1;
+      }
+
+      .version {
+        font-size: 10px;
+        color: #666;
+        font-weight: normal;
+        margin-left: 4px;
+      }
+
+      .share-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        background: #AF0C3E;
+        color: white;
+        border: none;
+        transition: background-color 0.2s, transform 0.1s;
+        cursor: pointer;
+        flex-shrink: 0;
+        margin-top: 2px;
+        padding: 0;
+      }
+
+      .share-btn img {
+        filter: brightness(0) invert(1);
+      }
+
+      .share-btn:hover {
+        background: #8b0a32;
+        transform: scale(1.05);
+      }
+
+      .share-btn:active {
+        transform: scale(0.95);
+      }
+
+      .info-box {
+        background: #28a745;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        text-align: center;
+        margin: 10px 0;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      body.god-mode .info-box {
+        background: #FFD700;
+        color: #000;
+        font-weight: 600;
+      }
+
       body.god-mode {
         background: #000;
         color: #FFD700;
+      }
+
+      body.god-mode .version {
+        color: #999;
+      }
+
+      body.god-mode .share-btn {
+        background: #FFD700;
+        color: #000;
+      }
+
+      body.god-mode .share-btn img {
+        filter: none;
+      }
+
+      body.god-mode .share-btn:hover {
+        background: #FFC700;
       }
 
       body.god-mode h3 {
@@ -36,9 +129,9 @@
       }
 
       h3 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        text-align: center;
+        margin: 0;
+        font-size: 16px;
+        display: inline;
         color: #AF0C3E;
       }
 

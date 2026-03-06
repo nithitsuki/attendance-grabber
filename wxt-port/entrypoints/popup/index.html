@@ -8,8 +8,21 @@
 </head>
 
 <body id="popupBody">
-  <h3>Amrita Attendance Fetcher</h3>
-  <button id="dump">Get Attendance</button>
+  <div class="header">
+    <div class="title-section">
+      <h3>Amrita Attendance Fetcher</h3>
+      <span id="version" class="version">v6.0</span>
+    </div>
+    <button id="shareBtn" class="share-btn" title="Share with friends">
+      <img src="/icon/share.svg" width="14" height="14" alt="Share" />
+    </button>
+  </div>
+  
+  <div id="infoBox" class="info-box" style="display: none;">
+    <span id="infoMessage">✓ Link copied to clipboard!</span>
+  </div>
+  
+  <button id="dump"><b>Get Attendance</b></button>
   <pre id="output" style="min-height: 0;"></pre>
   
   <button id="override" style="display: none; background: #000; color: #FFD700; border: 1px solid #FFD700;">Enter God Mode</button>

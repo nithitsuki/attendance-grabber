@@ -2,7 +2,7 @@
 
 This document outlines the steps to complete the port of your vanilla Firefox extension to WXT framework.
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 The WXT port has been structured with the following components:
 
@@ -19,7 +19,7 @@ The WXT port has been structured with the following components:
 - **`entrypoints/content/website-modifier.ts`** - Target website modifier
 - **`entrypoints/popup/`** - Popup interface
 
-## 🔧 Implementation Tasks
+## Implementation Tasks
 
 ### 1. Complete Attendance Data Extraction (`utils/attendance-extractor.ts`)
 
@@ -93,7 +93,7 @@ Replace browser API calls with appropriate cross-browser methods:
 - `browser.scripting.executeScript()` ✅
 - `browser.storage.local` (needs implementation)
 
-## 🚀 Development Workflow
+## Development Workflow
 
 1. **Build the extension:**
    ```bash
@@ -111,7 +111,7 @@ Replace browser API calls with appropriate cross-browser methods:
    - Test on https://students.amrita.edu/client/class-attendance
    - Test with target website (localhost:3000 or sad.nithitsuki.com)
 
-## 🔄 Migration Checklist
+## Migration Checklist
 
 - [ ] Port attendance extraction logic
 - [ ] Port username extraction logic  
@@ -123,7 +123,7 @@ Replace browser API calls with appropriate cross-browser methods:
 - [ ] Verify all permissions are correct
 - [ ] Test data flow end-to-end
 
-## 📝 Key Differences from Original
+## Key Differences from Original
 
 1. **File Structure:** WXT uses entry points instead of individual script files
 2. **TypeScript:** Strong typing for better maintainability
@@ -131,7 +131,7 @@ Replace browser API calls with appropriate cross-browser methods:
 4. **Configuration:** Centralized config management
 5. **Cross-browser:** Uses browser API for better compatibility
 
-## 🎯 Next Steps
+## Next Steps
 
 1. Start with `utils/attendance-extractor.ts` - port the core extraction logic
 2. Move to `utils/data-transfer.ts` - implement data transfer

@@ -212,7 +212,7 @@ export function validateAndMigrateSubjectsData(): boolean {
 
     // Check if data needs schema upgrade
     if (needsSchemaUpgrade(subjectsData)) {
-      logger.log('🔄 Migrating subjects data to new schema version...');
+      logger.log('Migrating subjects data to new schema version...');
       
       const migratedData = migrateAttendanceData(subjectsData);
       

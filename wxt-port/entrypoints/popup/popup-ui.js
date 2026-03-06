@@ -384,6 +384,8 @@ function setupDebugButtons() {
  * Initialize all popup UI functionality
  */
 function initializePopupUI() {
+  displayVersion();
+  setupShareButton();
   setupOverrideButton();
   setupKonamiCode();
   setupLocalhostOverride();
@@ -391,6 +393,80 @@ function initializePopupUI() {
   setupDebugLogging();
   setupDebugButtons();
   checkAutoEnableGodMode();
+}
+
+/**
+ * Display extension version from manifest
+ */
+function displayVersion() {
+  const versionEl = document.getElementById('version');
+  if (versionEl) {
+    const manifest = browser.runtime.getManifest();
+    versionEl.textContent = `v${manifest.version}`;
+  }
+}
+
+/**
+ * Setup share button with Web Share API or clipboard fallback
+ */
+function setupShareButton() {
+  const shareBtn = document.getElementById('shareBtn');
+  if (!shareBtn) return;
+
+  shareBtn.addEventListener('click', async () => {
+    const shareUrl = 'https://github.com/nithitsuki/attendance-grabber';
+    const shareData = {
+      title: 'Amrita Attendance Fetcher',
+      text: 'Check out this browser extension for Amrita University students!',
+      url: shareUrl
+    };
+
+    try {
+      // Try Web Share API first (works on mobile and some desktop browsers)
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        
+        // Show info box notification
+        showInfoBox('✓ Link copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      // Show error info box
+      showInfoBox('❌ Failed to copy link', true);
+    }
+  });
+}
+
+/**
+ * Show info box notification
+ * @param {string} message - Message to display
+ * @param {boolean} isError - Whether this is an error message
+ */
+function showInfoBox(message, isError = false) {
+  const infoBox = document.getElementById('infoBox');
+  const infoMessage = document.getElementById('infoMessage');
+  
+  if (!infoBox || !infoMessage) return;
+  
+  infoMessage.textContent = message;
+  
+  // Apply error styling if needed
+  if (isError) {
+    infoBox.style.background = '#dc3545';
+  } else {
+    infoBox.style.background = ''; // Reset to default
+  }
+  
+  // Show the info box
+  infoBox.style.display = 'block';
+  
+  // Hide after 2 seconds
+  setTimeout(() => {
+    infoBox.style.display = 'none';
+  }, 2000);
 }
 
 // Initialize when DOM is loaded

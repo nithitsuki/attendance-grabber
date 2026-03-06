@@ -1,14 +1,14 @@
-# 🎓 Amrita Attendance Fetcher
+# Amrita Attendance Fetcher
 
 A modern browser extension that streamlines attendance tracking for Amrita University students by automatically extracting attendance data from the university portal and presenting it through an enhanced dashboard experience.
 
-![Version](https://img.shields.io/badge/version-2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-6.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 [![Firefox Add-on](https://img.shields.io/badge/Firefox-Get%20Add--on-orange.svg)](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/)
 ![Edge Store](https://img.shields.io/badge/Edge-Under%20Review-yellow.svg)
 ![Chrome Store](https://img.shields.io/badge/Chrome-Sponsor%20Needed-red.svg)
 
-## 📦 Installation
+## Installation
 
 ###  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/firefox/firefox-original.svg" height=23 width=23 /> Firefox + Android
 click on the button below to install the extension directly from the Firefox Add-ons store:
@@ -30,7 +30,7 @@ Chrome Web Store publication requires a $5 developer fee. Since I don't personal
 The dev portal is horrible, I have no clue if it will even get published.\
 If you have published through this chinese dev portal before, [open an issue](https://github.com/nithitsuki/attendance-grabber/issues/new).
 
-## 🚀 Usage
+## Usage
 ### Quick Start
 1. **Pin the extension** to your browser toolbar (recommended for easy access)
 2. **Option A - Use Extension Popup**:
@@ -44,14 +44,14 @@ If you have published through this chinese dev portal before, [open an issue](ht
    - Click on the **Red Text** to fetch your latest attendance data
    ![Red Text button](marketing/dashboard.png)
 
-### 🛠️ Local Installation (Devlprs)
+### Local Installation (Devlprs)
 ```bash
 git clone https://github.com/nithitsuki/attendance-grabber.git
 cd attendance-grabber/wxt-port && pnpm i 
 pnpx wxt zip -b firefox
 # or `pnpx wxt zip` for soy browsers
 ```
-## 📖 Documentation
+## Documentation
 Figure out the [wxt development](https://wxt.dev) yourself.
 
 ### Data Privacy
@@ -60,6 +60,6 @@ Figure out the [wxt development](https://wxt.dev) yourself.
 - ✅ **Temporary Storage**: Uses browser's local storage only for immediate data transfer
 - ✅ **Open Source**: Complete code transparency for security review
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.

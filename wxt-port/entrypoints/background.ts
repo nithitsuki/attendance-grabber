@@ -34,7 +34,49 @@ export default defineBackground(() => {
       
       return true; // Indicates we'll send response asynchronously
     }
+    
+    if (request.action === "fetchUsernameFromPortal") {
+      fetchUsernameViaBackground()
+        .then(username => sendResponse({ success: true, data: username }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      
+      return true;
+    }
   });
+
+  /**
+   * Fetches username from the Amrita portal page (background can make cross-origin requests)
+   */
+  async function fetchUsernameViaBackground(): Promise<string | null> {
+    try {
+      const portalUrl = 'https://students.amrita.edu/client/index';
+      const response = await fetch(portalUrl, { credentials: 'include' });
+      
+      if (!response.ok) {
+        console.log('Portal fetch failed:', response.status);
+        return null;
+      }
+      
+      const html = await response.text();
+      
+      // Try: Welcome! NAME( ROLL )
+      const match = html.match(/Welcome!\s*([^(]+)\s*\(/i);
+      if (match?.[1]) {
+        return match[1].trim();
+      }
+      
+      // Try: .user-info content in HTML
+      const userInfoMatch = html.match(/<[^>]*class="[^"]*user-info[^"]*"[^>]*>([^<]+)</i);
+      if (userInfoMatch?.[1]) {
+        return userInfoMatch[1].trim();
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Background username fetch failed:', error);
+      return null;
+    }
+  }
 
   /**
    * Main handler for attendance extraction requests
@@ -43,7 +85,7 @@ export default defineBackground(() => {
    * @returns Promise resolving to attendance data
    */
   async function handleGetAttendance(targetWebsite?: string) {
-    console.log("🎯 Processing attendance extraction request (popup dump button logic)...");
+    console.log("Processing attendance extraction request (popup dump button logic)...");
     
     try {
       // Step 1: Get the active tab (same as popup)
@@ -54,8 +96,8 @@ export default defineBackground(() => {
       }
 
       const portalUrl = String(CONFIG.AMRITA_PORTAL.BASE_URL + CONFIG.AMRITA_PORTAL.ATTENDANCE_PATH);
-      console.log("🌐 Portal URL:", portalUrl);
-      console.log("📍 Current tab URL:", tab.url);
+      console.log("Portal URL:", portalUrl);
+      console.log("Current tab URL:", tab.url);
 
       // Step 2: Check if current tab is on the portal URL (same as popup)
       if (tab.url && tab.url.includes(portalUrl)) {
@@ -74,8 +116,8 @@ export default defineBackground(() => {
         const username = usernameResult?.result || 'Unknown';
         const attendanceData = result?.result?.data || [];
         
-        console.log("👤 Username:", username);
-        console.log("📊 Subjects data:", JSON.stringify(attendanceData, null, 2));
+        console.log("Username:", username);
+        console.log("Subjects data:", JSON.stringify(attendanceData, null, 2));
 
         // Transfer data to target website if specified
         if (targetWebsite) {
@@ -89,7 +131,7 @@ export default defineBackground(() => {
         };
         
       } else {
-        console.log("🚀 Not on attendance page, navigating...");
+        console.log("Not on attendance page, navigating...");
         
         // Navigate to the portal URL (same as popup)
         await browser.tabs.update(tab.id, { url: portalUrl });
@@ -126,7 +168,7 @@ export default defineBackground(() => {
                 }
               }
             });
-            console.log('🔐 Login page detected, clicked submit button');
+            console.log('Login page detected, clicked submit button');
           }
         }
 
@@ -168,8 +210,8 @@ export default defineBackground(() => {
           const username = usernameResult?.result || 'Unknown';
           const attendanceData = result?.result?.data || [];
           
-          console.log("👤 Username:", username);
-          console.log("📊 Subjects data:", JSON.stringify(attendanceData, null, 2));
+          console.log("Username:", username);
+          console.log("Subjects data:", JSON.stringify(attendanceData, null, 2));
 
           // Transfer data to target website if specified
           if (targetWebsite) {

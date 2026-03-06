@@ -4,7 +4,7 @@ This directory contains the modular website modification system for the Attendan
 
 ## Module Structure
 
-### 📋 `types.ts`
+### `types.ts`
 **Core type definitions and interfaces**
 - `AppSettings` interface for website settings
 - `AttendanceUpdateRequest` and `AttendanceUpdateResponse` interfaces
@@ -20,7 +20,7 @@ This directory contains the modular website modification system for the Attendan
 - `resetAppSettings()` - Reset to default values
 - `validateAppSettings()` - Validate settings structure
 
-### 👤 `user-utils.ts`
+### `user-utils.ts`
 **User-related utilities**
 - `getRawUsername()` - Get username from localStorage
 - `formatUsername()` - Format username with proper capitalization
@@ -30,7 +30,7 @@ This directory contains the modular website modification system for the Attendan
 - `validateUsername()` - Validate username format
 - `getUserInitials()` - Extract user initials for display
 
-### 🎯 `attendance-handler.ts`
+### `attendance-handler.ts`
 **Attendance update functionality**
 - `handleAttendanceUpdate()` - Main attendance update function
 - `exposeAttendanceUpdateFunction()` - Make functions globally available
@@ -39,7 +39,7 @@ This directory contains the modular website modification system for the Attendan
 - `validateAttendanceUpdateRequest()` - Validate update requests
 - `createCustomAttendanceUpdateTrigger()` - Create custom triggers
 
-### 📡 `event-dispatcher.ts`
+### `event-dispatcher.ts`
 **Event handling and React integration**
 - `dispatchExtensionEvent()` - Dispatch custom events
 - `dispatchAppSettingsUpdateEvent()` - Settings update events
@@ -49,7 +49,7 @@ This directory contains the modular website modification system for the Attendan
 - `setupWebsiteIntegrationListeners()` - Two-way communication setup
 - `dispatchAttendanceUpdateSuccess/Error()` - Convenience functions
 
-### 🚀 `website-modifier.ts`
+### `website-modifier.ts`
 **Main orchestrator (simplified)**
 - `initializeWebsiteModifications()` - Main entry point
 - `updateWebsiteSettings()` - Private settings update coordinator
@@ -113,13 +113,13 @@ triggerSettingsUpdate();
 
 ## Benefits of Modular Structure
 
-1. **🔧 Better Maintainability**: Each module has a single responsibility
-2. **📚 Improved Documentation**: Each function is thoroughly documented
-3. **🧪 Easier Testing**: Modules can be tested in isolation
-4. **🔄 Reusability**: Functions can be reused across different contexts
-5. **📈 Better Type Safety**: Centralized type definitions prevent inconsistencies
-6. **🐛 Easier Debugging**: Issues can be traced to specific modules
-7. **👥 Team Development**: Different team members can work on different modules
+1. **Better Maintainability**: Each module has a single responsibility
+2. **Improved Documentation**: Each function is thoroughly documented
+3. **Easier Testing**: Modules can be tested in isolation
+4. **Reusability**: Functions can be reused across different contexts
+5. **Better Type Safety**: Centralized type definitions prevent inconsistencies
+6. **Easier Debugging**: Issues can be traced to specific modules
+7. **Team Development**: Different team members can work on different modules
 
 ## File Size Comparison
 

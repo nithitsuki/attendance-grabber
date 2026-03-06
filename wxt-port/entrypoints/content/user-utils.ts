@@ -9,11 +9,25 @@ import * as logger from '../../utils/logger';
 
 const UNKNOWN_USER = 'Unknown User';
 const AMRITA_PORTAL_URL = 'https://students.amrita.edu/client/index';
+const USERNAME_STORAGE_KEY = 'username';
 
 /**
- * Retrieves username from localStorage
+ * Retrieves username from browser.storage (cross-domain)
  */
-export function getRawUsername(): string {
+export async function getRawUsername(): Promise<string> {
+  try {
+    const result = await browser.storage.local.get(USERNAME_STORAGE_KEY);
+    return result[USERNAME_STORAGE_KEY] || UNKNOWN_USER;
+  } catch {
+    return UNKNOWN_USER;
+  }
+}
+
+/**
+ * Retrieves username from localStorage (legacy, domain-specific)
+ * Used as fallback for same-domain operations
+ */
+function getRawUsernameSync(): string {
   try {
     return localStorage.getItem(STORAGE_KEYS.USERNAME) || UNKNOWN_USER;
   } catch {
@@ -22,27 +36,48 @@ export function getRawUsername(): string {
 }
 
 /**
- * Fetches username from Amrita student portal by parsing the welcome message
+ * Fetches username from Amrita student portal.
+ * If on portal: parses DOM directly.
+ * If on another site: asks background script to fetch (cross-origin).
  */
 export async function fetchUsernameFromAmritaPortal(): Promise<string | null> {
   try {
-    const response = await fetch(AMRITA_PORTAL_URL, { credentials: 'include' });
-    
-    if (!response.ok) {
-      logger.warn('Failed to fetch Amrita portal:', response.status);
+    // If on the Amrita portal, extract directly from DOM
+    if (window.location.hostname.includes('students.amrita.edu')) {
+      // Try to get username from .user-info element
+      const usernameElement = document.querySelector('.user-info');
+      if (usernameElement) {
+        const usernameText = usernameElement.textContent?.trim() || '';
+        const username = usernameText.split(' ')[0];
+        if (username && username !== 'Unknown') {
+          logger.log('Username extracted from DOM:', username);
+          return username;
+        }
+      }
+      
+      // Fallback: fetch the index page
+      const response = await fetch(AMRITA_PORTAL_URL, { credentials: 'include' });
+      if (response.ok) {
+        const html = await response.text();
+        const match = html.match(/Welcome!\s*([^(]+)\s*\(/i);
+        if (match?.[1]) {
+          return match[1].trim();
+        }
+      }
+      
       return null;
     }
     
-    const html = await response.text();
+    // Not on portal - ask background script to fetch cross-origin
+    logger.log('Requesting username from background script...');
+    const response = await browser.runtime.sendMessage({ action: 'fetchUsernameFromPortal' });
     
-    // Pattern: Welcome! NAME( ROLL_NUMBER )
-    const match = html.match(/Welcome!\s*([^(]+)\s*\(/i);
-    
-    if (match?.[1]) {
-      return match[1].trim();
+    if (response?.success && response.data) {
+      logger.log('Username received from background:', response.data);
+      return response.data;
     }
     
-    logger.warn('Username not found in portal HTML');
+    logger.warn('Background script could not fetch username');
     return null;
   } catch (error) {
     logger.error('Error fetching username:', error);
@@ -54,7 +89,7 @@ export async function fetchUsernameFromAmritaPortal(): Promise<string | null> {
  * Resolves username - fetches from portal if currently "Unknown User"
  */
 export async function resolveUsername(): Promise<string> {
-  const currentUsername = getRawUsername();
+  const currentUsername = await getRawUsername();
   
   if (currentUsername !== UNKNOWN_USER) {
     return currentUsername;
@@ -74,17 +109,25 @@ export async function resolveUsername(): Promise<string> {
  * Formats username: returns first name with proper capitalization
  */
 export function formatUsername(rawUsername?: string): string {
-  const username = rawUsername || getRawUsername();
+  const username = rawUsername || getRawUsernameSync();
   const firstName = username.split(/\s+/)[0];
   
   return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 }
 
 /**
- * Gets formatted username from localStorage
+ * Gets formatted username from localStorage (sync, for display)
  */
 export function getFormattedUsername(): string {
   return formatUsername();
+}
+
+/**
+ * Gets formatted username from storage (async, cross-domain)
+ */
+export async function getFormattedUsernameFromStorage(): Promise<string> {
+  const username = await getRawUsername();
+  return formatUsername(username);
 }
 
 /**
@@ -96,25 +139,30 @@ export async function getFormattedUsernameAsync(): Promise<string> {
 }
 
 /**
- * Saves username to localStorage and updates the display titlePayload
+ * Saves username to browser.storage (cross-domain) and localStorage
  * Does NOT save "Unknown User" if we already have a valid username
  */
-export function saveUsername(username: string): boolean {
+export async function saveUsername(username: string): Promise<boolean> {
   // Don't overwrite a valid username with "Unknown User"
   if (username === UNKNOWN_USER) {
-    const currentUsername = getRawUsername();
+    const currentUsername = await getRawUsername();
     if (currentUsername !== UNKNOWN_USER) {
       return false; // Keep the existing valid username
     }
   }
   
   try {
+    // Save to browser.storage (cross-domain)
+    await browser.storage.local.set({ [USERNAME_STORAGE_KEY]: username });
+    
+    // Also save to localStorage for legacy compatibility
     localStorage.setItem(STORAGE_KEYS.USERNAME, username);
     
     // Update titlePayload so the page displays the new username
     const newTitlePayload = createWelcomeMessageHtml(username);
     updateAppSettings({ titlePayload: newTitlePayload });
     
+    logger.log('Username saved to storage:', username);
     return true;
   } catch (error) {
     logger.error('Error saving username:', error);
@@ -183,7 +231,7 @@ export function validateUsername(username: string): boolean {
  * Gets username initials (max 3 characters)
  */
 export function getUserInitials(customUsername?: string): string {
-  const username = customUsername || getRawUsername();
+  const username = customUsername || getRawUsernameSync();
   
   return username
     .split(' ')
@@ -198,8 +246,8 @@ export function getUserInitials(customUsername?: string): string {
 export function exposeDebugFunctions(): void {
   (window as any).debugFetchUsername = fetchUsernameFromAmritaPortal;
   (window as any).debugResolveUsername = resolveUsername;
-  (window as any).debugCheckUsername = () => ({
-    raw: getRawUsername(),
-    isUnknown: getRawUsername() === UNKNOWN_USER
+  (window as any).debugCheckUsername = async () => ({
+    raw: await getRawUsername(),
+    isUnknown: (await getRawUsername()) === UNKNOWN_USER
   });
 }
