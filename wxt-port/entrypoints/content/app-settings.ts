@@ -10,6 +10,7 @@
 
 import { AppSettings, DEFAULT_APP_SETTINGS, STORAGE_KEYS } from './types';
 import { ATTENDANCE_SCHEMA_VERSION, needsSchemaUpgrade, migrateAttendanceData, validateAttendanceData } from '../../utils/attendance-extractor';
+import * as logger from '../../utils/logger';
 
 /**
  * Retrieves existing app settings from localStorage
@@ -39,11 +40,11 @@ export function getExistingAppSettings(): AppSettings {
       }
     }
   } catch (error) {
-    console.warn('Error parsing existing app settings from localStorage:', error);
+    logger.warn('Error parsing existing app settings from localStorage:', error);
   }
 
   // Return default settings if none exist or parsing fails
-  console.log('Using default app settings');
+  logger.log('Using default app settings');
   return { ...DEFAULT_APP_SETTINGS };
 }
 
@@ -73,14 +74,14 @@ export function saveAppSettings(settings: AppSettings): boolean {
     const serializedSettings = JSON.stringify(settings);
     localStorage.setItem(STORAGE_KEYS.APP_SETTINGS, serializedSettings);
     
-    console.log('App settings saved to localStorage:', settings);
+    logger.log('App settings saved to localStorage:', settings);
     return true;
   } catch (error) {
-    console.error('Error saving app settings to localStorage:', error);
+    logger.error('Error saving app settings to localStorage:', error);
     
     // Check if it's a quota exceeded error
     if (error instanceof Error && error.name === 'QuotaExceededError') {
-      console.error('localStorage quota exceeded. Consider clearing old data.');
+      logger.error('localStorage quota exceeded. Consider clearing old data.');
     }
     
     return false;
@@ -110,7 +111,7 @@ export function updateAppSettings(updates: Partial<AppSettings>): AppSettings {
   
   const saveSuccess = saveAppSettings(mergedSettings);
   if (!saveSuccess) {
-    console.warn('Failed to save updated settings, returning merged settings anyway');
+    logger.warn('Failed to save updated settings, returning merged settings anyway');
   }
   
   return mergedSettings;
@@ -134,7 +135,7 @@ export function resetAppSettings(): AppSettings {
   const defaultSettings = { ...DEFAULT_APP_SETTINGS };
   saveAppSettings(defaultSettings);
   
-  console.log('App settings reset to defaults');
+  logger.log('App settings reset to defaults');
   return defaultSettings;
 }
 
@@ -205,13 +206,13 @@ export function validateAndMigrateSubjectsData(): boolean {
     
     // Check if current data is already valid for current schema
     if (validateAttendanceData(subjectsData)) {
-      console.log('✅ Subjects data is valid for current schema version');
+      logger.log('✅ Subjects data is valid for current schema version');
       return true;
     }
 
     // Check if data needs schema upgrade
     if (needsSchemaUpgrade(subjectsData)) {
-      console.log('🔄 Migrating subjects data to new schema version...');
+      logger.log('🔄 Migrating subjects data to new schema version...');
       
       const migratedData = migrateAttendanceData(subjectsData);
       
@@ -220,7 +221,7 @@ export function validateAndMigrateSubjectsData(): boolean {
         localStorage.setItem(STORAGE_KEYS.SUBJECTS_DATA, JSON.stringify(migratedData));
         
         // Log migration success
-        console.log(`✅ Successfully migrated subjects data to schema v${ATTENDANCE_SCHEMA_VERSION}`);
+        logger.log(`✅ Successfully migrated subjects data to schema v${ATTENDANCE_SCHEMA_VERSION}`);
         
         // Store migration info
         localStorage.setItem('schemaMigration', JSON.stringify({
@@ -235,7 +236,7 @@ export function validateAndMigrateSubjectsData(): boolean {
     }
 
     // If we reach here, data is incompatible and needs to be cleared
-    console.warn('⚠️ Subjects data is incompatible with current schema. Clearing old data.');
+    logger.warn('⚠️ Subjects data is incompatible with current schema. Clearing old data.');
     localStorage.removeItem(STORAGE_KEYS.SUBJECTS_DATA);
     
     // Store cleanup info
@@ -248,7 +249,7 @@ export function validateAndMigrateSubjectsData(): boolean {
     return false;
     
   } catch (error) {
-    console.error('❌ Error validating/migrating subjects data:', error);
+    logger.error('❌ Error validating/migrating subjects data:', error);
     
     // Clear potentially corrupted data
     localStorage.removeItem(STORAGE_KEYS.SUBJECTS_DATA);
@@ -296,7 +297,7 @@ export function getSchemaMigrationInfo(): { type: 'migration' | 'cleanup', detai
 
     return null;
   } catch (error) {
-    console.error('Error getting schema migration info:', error);
+    logger.error('Error getting schema migration info:', error);
     return null;
   }
 }

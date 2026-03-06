@@ -7,12 +7,14 @@
  * Current schema version for attendance records
  * Increment this when making breaking changes to the AttendanceRecord structure
  */
-export const ATTENDANCE_SCHEMA_VERSION = 2;
+export const ATTENDANCE_SCHEMA_VERSION = 3;
 
 export interface AttendanceRecord {
     Sl_No: string;
+    courseCode: string;
     Course: string;
     CourseAbbreviation: string;
+    faculty: string[];
     total: number;
     present: number;
     absent: number;
@@ -38,7 +40,7 @@ export interface ExtractionResult {
  */
 export function extractAttendanceData(): ExtractionResult {
     // Define schema version inside the function for page context execution
-    const CURRENT_SCHEMA_VERSION = 2;
+    const CURRENT_SCHEMA_VERSION = 3;
     
     try {
         console.log("Extracting attendance data from page...");
@@ -92,18 +94,22 @@ export function extractAttendanceData(): ExtractionResult {
             console.log(`Processing data row ${index} with ${columns.length} columns`);
 
             try {
-                // Safely extract course name with null checking
+                // Safely extract course name and code with null checking
                 const courseElement = columns[2];
                 if (!courseElement) {
                     console.error(`Row ${index}: Column 2 (course) is null`);
                     return;
                 }
                 
-                const courseCleaned = courseElement.innerHTML ? 
-                    courseElement.innerHTML.replace(/.*<br>/, '') : 
-                    courseElement.textContent?.trim() || '';
+                // Course column contains "CODE<br>Course Name"
+                const courseHtml = courseElement.innerHTML || '';
+                const courseParts = courseHtml.split(/<br\s*\/?>/i);
+                const courseCode = courseParts[0]?.trim() || '';
+                const courseCleaned = courseParts.length > 1 
+                    ? courseParts.slice(1).join(' ').trim() 
+                    : courseElement.textContent?.trim() || '';
                 
-                console.log(`Row ${index}: Course extracted: "${courseCleaned}"`);
+                console.log(`Row ${index}: Course code: "${courseCode}", name: "${courseCleaned}"`);
                 
                 const courseAbbreviation = courseCleaned.toLowerCase().includes('iot') ? 'I.O.T'
                     : courseCleaned.split(' ')
@@ -111,10 +117,22 @@ export function extractAttendanceData(): ExtractionResult {
                         .map(word => word[0].toUpperCase())
                         .join('.');
 
+                // Faculty column contains names separated by <br> tags
+                const facultyElement = columns[3];
+                const facultyHtml = facultyElement?.innerHTML || '';
+                const faculty = facultyHtml
+                    .split(/<br\s*\/?>/i)
+                    .map(name => name.trim())
+                    .filter(name => name.length > 0);
+                
+                console.log(`Row ${index}: Faculty: [${faculty.join(', ')}]`);
+
                 const record: AttendanceRecord = {
                     Sl_No: columns[0]?.textContent?.trim() || '',
+                    courseCode: courseCode,
                     Course: courseCleaned,
                     CourseAbbreviation: courseAbbreviation,
+                    faculty: faculty,
                     total: parseInt(columns[4]?.textContent?.trim() || '0') || 0,
                     present: parseInt(columns[5]?.textContent?.trim() || '0') || 0,
                     absent: parseInt(columns[7]?.textContent?.trim() || '0') || 0,
@@ -203,6 +221,8 @@ export function validateAttendanceData(data: any): data is AttendanceRecord[] {
             typeof record.Sl_No === 'string' &&
             typeof record.Course === 'string' &&
             typeof record.CourseAbbreviation === 'string' &&
+            typeof record.courseCode === 'string' &&
+            Array.isArray(record.faculty) &&
             typeof record.total === 'number' &&
             typeof record.present === 'number' &&
             typeof record.absent === 'number' &&
@@ -245,21 +265,22 @@ export function migrateAttendanceData(data: any): AttendanceRecord[] | null {
 
     try {
         return data.map(record => {
+            let migrated = { ...record };
+
             // Migration from schema v1 to v2: separate dutyLeave and medicalLeave
-            if (!record.schemaVersion || record.schemaVersion < 2) {
-                return {
-                    ...record,
-                    dutyLeave: 0, // Default values for new fields
-                    medicalLeave: 0,
-                    schemaVersion: ATTENDANCE_SCHEMA_VERSION
-                };
+            if (!migrated.schemaVersion || migrated.schemaVersion < 2) {
+                migrated.dutyLeave = migrated.dutyLeave ?? 0;
+                migrated.medicalLeave = migrated.medicalLeave ?? 0;
             }
 
-            // Already current schema version
-            return {
-                ...record,
-                schemaVersion: ATTENDANCE_SCHEMA_VERSION
-            };
+            // Migration from schema v2 to v3: add courseCode and faculty
+            if (!migrated.schemaVersion || migrated.schemaVersion < 3) {
+                migrated.courseCode = migrated.courseCode ?? '';
+                migrated.faculty = migrated.faculty ?? [];
+            }
+
+            migrated.schemaVersion = ATTENDANCE_SCHEMA_VERSION;
+            return migrated;
         });
     } catch (error) {
         console.error('Error migrating attendance data:', error);

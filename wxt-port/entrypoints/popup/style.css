@@ -3,6 +3,36 @@
         padding: 20px;
         margin: 0;
         min-width: 300px;
+        background: #fff;
+        color: #000;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      body.god-mode {
+        background: #000;
+        color: #FFD700;
+      }
+
+      body.god-mode h3 {
+        color: #FFD700;
+      }
+
+      body.god-mode label {
+        color: #FFD700;
+      }
+
+      body.god-mode h4 {
+        color: #FFD700;
+      }
+
+      body.god-mode input[type="text"] {
+        background: #1a1a1a;
+        color: #FFD700;
+        border: 1px solid #FFD700;
+      }
+
+      body.god-mode input[type="text"]::placeholder {
+        color: #666;
       }
 
       h3 {
@@ -45,4 +75,18 @@
 
         pre:not(:empty) {
           display: block;
+        }
+
+        .debug-buttons {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+
+        .compact-btn {
+          padding: 6px 10px;
+          font-size: 12px;
+          margin: 0;
+          width: 100%;
         }

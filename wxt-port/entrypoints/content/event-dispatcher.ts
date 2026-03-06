@@ -9,6 +9,7 @@
  */
 
 import { ExtensionEvents, ExtensionEventDetail, STORAGE_KEYS } from './types';
+import * as logger from '../../utils/logger';
 
 /**
  * Dispatches a custom event with extension-specific data
@@ -37,10 +38,10 @@ export function dispatchExtensionEvent(eventType: string, detail: ExtensionEvent
     });
     
     window.dispatchEvent(customEvent);
-    console.log(`Extension event dispatched: ${eventType}`, detail);
+    logger.log(`Extension event dispatched: ${eventType}`, detail);
     
   } catch (error) {
-    console.error(`Error dispatching extension event ${eventType}:`, error);
+    logger.error(`Error dispatching extension event ${eventType}:`, error);
   }
 }
 
@@ -93,10 +94,10 @@ export function triggerReactStateUpdate(storageKey: string, newValue?: string): 
     });
     
     window.dispatchEvent(storageEvent);
-    console.log(`Storage event dispatched for key: ${storageKey}`);
+    logger.log(`Storage event dispatched for key: ${storageKey}`);
     
   } catch (error) {
-    console.error(`Error dispatching storage event for ${storageKey}:`, error);
+    logger.error(`Error dispatching storage event for ${storageKey}:`, error);
   }
 }
 
@@ -114,7 +115,7 @@ export function triggerReactStateUpdate(storageKey: string, newValue?: string): 
  * ```
  */
 export function triggerSettingsUpdate(): void {
-  console.log('Triggering comprehensive settings update...');
+  logger.log('Triggering comprehensive settings update...');
   
   // Method 1: Dispatch custom extension event
   dispatchAppSettingsUpdateEvent();
@@ -122,7 +123,7 @@ export function triggerSettingsUpdate(): void {
   // Method 2: Trigger React state updates if React is detected
   setTimeout(() => {
     if (isReactDetected()) {
-      console.log('React detected, attempting to trigger re-render...');
+      logger.log('React detected, attempting to trigger re-render...');
       
       // Dispatch storage event for app settings
       triggerReactStateUpdate(STORAGE_KEYS.APP_SETTINGS);
@@ -203,14 +204,14 @@ export function setupWebsiteIntegrationListeners(): void {
   
   // Listen for website requests to refresh attendance
   window.addEventListener('requestAttendanceUpdate', () => {
-    console.log('Website requested attendance update');
+    logger.log('Website requested attendance update');
     dispatchExtensionEvent('attendanceUpdateRequested', {
       source: 'website',
       message: 'Website has requested an attendance update'
     });
   });
   
-  console.log('Website integration event listeners established');
+  logger.log('Website integration event listeners established');
 }
 
 /**
@@ -227,7 +228,7 @@ export function setupWebsiteIntegrationListeners(): void {
  */
 export function removeIntegrationListeners(): void {
   // Remove specific listeners (would need to store references for proper cleanup)
-  console.log('Extension integration listeners removed');
+  logger.log('Extension integration listeners removed');
 }
 
 /**

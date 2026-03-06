@@ -4,6 +4,7 @@
  */
 
 import { CONFIG } from '../../utils/config';
+import * as logger from '../../utils/logger';
 import { updateAppSettings, validateAndMigrateSubjectsData, getSchemaMigrationInfo, getExistingAppSettings } from './app-settings';
 import { createWelcomeMessageHtml, setupUsernameButtonClickHandler, exposeDebugFunctions, getRawUsername, resolveUsername } from './user-utils';
 import { exposeAttendanceUpdateFunction } from './attendance-handler';
@@ -23,7 +24,7 @@ export function initializeWebsiteModifications(): void {
       setupWebsiteIntegrationListeners();
       exposeDebugFunctions();
     } catch (error) {
-      console.error('Error during website initialization:', error);
+      logger.error('Error during website initialization:', error);
     }
   }, CONFIG.BEHAVIOR.HYDRATION_DELAY);
 }
@@ -45,7 +46,7 @@ async function updateWebsiteSettings(): Promise<void> {
     
     triggerSettingsUpdate();
   } catch (error) {
-    console.error('Error updating website settings:', error);
+    logger.error('Error updating website settings:', error);
   }
 }
 

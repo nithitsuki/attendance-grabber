@@ -3,6 +3,8 @@
  * Routes to appropriate handler based on URL
  */
 
+import { initLogger } from '../utils/logger';
+
 export default defineContentScript({
   matches: [
     'https://students.amrita.edu/client/class-attendance*',
@@ -11,7 +13,8 @@ export default defineContentScript({
     'http://127.0.0.1:3000/*',
     'https://sad.nithitsuki.com/*'
   ],
-  main() {
+  async main() {
+    await initLogger();
     setupMessageListener();
     
     if (window.location.href.includes('students.amrita.edu/client/class-attendance')) {
@@ -32,7 +35,7 @@ async function initializeAttendancePage() {
       initializeAttendanceButton();
     }
   } catch (error) {
-    console.error('Failed to load attendance page module:', error);
+    (await import('../utils/logger')).error('Failed to load attendance page module:', error);
   }
 }
 
@@ -41,7 +44,7 @@ async function initializeWebsiteModifier() {
     const { initializeWebsiteModifications } = await import('./content/website-modifier');
     initializeWebsiteModifications();
   } catch (error) {
-    console.error('Failed to load website modifier:', error);
+    (await import('../utils/logger')).error('Failed to load website modifier:', error);
   }
 }
 

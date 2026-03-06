@@ -4,12 +4,13 @@
  */
 
 import { CONFIG } from '../../utils/config';
+import * as logger from '../../utils/logger';
 
 /**
  * Main initialization function for the attendance button
  */
 export function initializeAttendanceButton(): void {
-  console.log('Attendance page content script loaded');
+  logger.log('Attendance page content script loaded');
   
   // TODO: Implement button creation and injection
   // 1. Check if button already exists (avoid duplicates)
@@ -19,7 +20,7 @@ export function initializeAttendanceButton(): void {
   // 5. Inject button into the page
   
   if (document.getElementById('attendance-fetcher-btn')) {
-    console.log('Attendance button already exists');
+    logger.log('Attendance button already exists');
     return;
   }
   
@@ -105,7 +106,7 @@ async function handleAttendanceButtonClick(event: Event): Promise<void> {
       showErrorState(button, response.error);
     }
   } catch (error) {
-    console.error('Error getting attendance:', error);
+    logger.error('Error getting attendance:', error);
     showErrorState(button, 'Failed to get attendance');
   }
 }
@@ -138,7 +139,7 @@ function showErrorState(button: HTMLButtonElement, errorMessage: string): void {
   // 2. Log error for debugging
   // 3. Set timeout to reset button
   
-  console.error('Attendance extraction error:', errorMessage);
+  logger.error('Attendance extraction error:', errorMessage);
   button.textContent = 'Error - Try Again';
   button.style.backgroundColor = CONFIG.UI.ERROR_COLOR;
   
@@ -171,10 +172,10 @@ function injectButtonIntoPage(button: HTMLButtonElement): void {
   const targetElement = document.querySelector('#home_view form > div');
   
   if (!targetElement) {
-    console.warn('Could not find target element for attendance button');
+    logger.warn('Could not find target element for attendance button');
     return;
   }
   
   targetElement.appendChild(button);
-  console.log('Attendance button added to page');
+  logger.log('Attendance button added to page');
 }

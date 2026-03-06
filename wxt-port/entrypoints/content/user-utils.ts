@@ -5,6 +5,7 @@
 
 import { STORAGE_KEYS } from './types';
 import { updateAppSettings } from './app-settings';
+import * as logger from '../../utils/logger';
 
 const UNKNOWN_USER = 'Unknown User';
 const AMRITA_PORTAL_URL = 'https://students.amrita.edu/client/index';
@@ -28,7 +29,7 @@ export async function fetchUsernameFromAmritaPortal(): Promise<string | null> {
     const response = await fetch(AMRITA_PORTAL_URL, { credentials: 'include' });
     
     if (!response.ok) {
-      console.warn('Failed to fetch Amrita portal:', response.status);
+      logger.warn('Failed to fetch Amrita portal:', response.status);
       return null;
     }
     
@@ -41,10 +42,10 @@ export async function fetchUsernameFromAmritaPortal(): Promise<string | null> {
       return match[1].trim();
     }
     
-    console.warn('Username not found in portal HTML');
+    logger.warn('Username not found in portal HTML');
     return null;
   } catch (error) {
-    console.error('Error fetching username:', error);
+    logger.error('Error fetching username:', error);
     return null;
   }
 }
@@ -116,7 +117,7 @@ export function saveUsername(username: string): boolean {
     
     return true;
   } catch (error) {
-    console.error('Error saving username:', error);
+    logger.error('Error saving username:', error);
     return false;
   }
 }

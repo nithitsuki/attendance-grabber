@@ -116,13 +116,51 @@ async function getTargetWebsite() {
 function setupOverrideButton() {
   const overrideButton = document.getElementById('override');
   const overrideOptions = document.getElementById('overrideOptions');
+  const exitButton = document.getElementById('exitGodMode');
+  const body = document.getElementById('popupBody');
+  const ritualText = document.getElementById('ritualText');
   
   if (overrideButton && overrideOptions) {
     overrideButton.addEventListener('click', function () {
-      this.style.display = 'none';
-      overrideOptions.style.display = 'block';
+      enterGodMode();
     });
   }
+
+  if (exitButton) {
+    exitButton.addEventListener('click', function () {
+      exitGodMode();
+    });
+  }
+}
+
+/**
+ * Enter God Mode
+ */
+function enterGodMode() {
+  const overrideButton = document.getElementById('override');
+  const overrideOptions = document.getElementById('overrideOptions');
+  const body = document.getElementById('popupBody');
+  const ritualText = document.getElementById('ritualText');
+
+  if (overrideButton) overrideButton.style.display = 'none';
+  if (overrideOptions) overrideOptions.style.display = 'block';
+  if (body) body.classList.add('god-mode');
+  if (ritualText) ritualText.style.display = 'none';
+}
+
+/**
+ * Exit God Mode
+ */
+function exitGodMode() {
+  const overrideButton = document.getElementById('override');
+  const overrideOptions = document.getElementById('overrideOptions');
+  const body = document.getElementById('popupBody');
+  const ritualText = document.getElementById('ritualText');
+
+  if (overrideOptions) overrideOptions.style.display = 'none';
+  if (overrideButton) overrideButton.style.display = 'block';
+  if (body) body.classList.remove('god-mode');
+  if (ritualText) ritualText.style.display = 'block';
 }
 
 /**
@@ -169,8 +207,8 @@ async function checkAutoEnableGodMode() {
       
       if (overrideButton && overrideOptions) {
         overrideButton.style.display = 'block';
-        // Optionally auto-expand the options too
-        overrideOptions.style.display = 'block';
+        // Auto-expand and apply god mode styling
+        enterGodMode();
       }
     }
   } catch (error) {
@@ -220,6 +258,47 @@ function setupGodModeAutoEnable() {
     // Save preference when changed
     godModeCheckbox.addEventListener('change', function () {
       saveGodModePreference(this.checked);
+    });
+  }
+}
+
+/**
+ * Load debug logging preference from storage
+ */
+async function loadDebugLoggingPreference() {
+  try {
+    const result = await browser.storage.local.get(['debugLogging']);
+    const checkbox = document.getElementById('debugLogging');
+    if (checkbox) {
+      checkbox.checked = result.debugLogging || false;
+    }
+  } catch (error) {
+    console.error('Error loading debug logging preference:', error);
+  }
+}
+
+/**
+ * Save debug logging preference to storage
+ * @param {boolean} enabled
+ */
+async function saveDebugLoggingPreference(enabled) {
+  try {
+    await browser.storage.local.set({ debugLogging: enabled });
+    console.log('Debug logging preference saved:', enabled);
+  } catch (error) {
+    console.error('Error saving debug logging preference:', error);
+  }
+}
+
+/**
+ * Setup debug logging toggle
+ */
+function setupDebugLogging() {
+  const checkbox = document.getElementById('debugLogging');
+  if (checkbox) {
+    loadDebugLoggingPreference();
+    checkbox.addEventListener('change', function () {
+      saveDebugLoggingPreference(this.checked);
     });
   }
 }
@@ -309,6 +388,7 @@ function initializePopupUI() {
   setupKonamiCode();
   setupLocalhostOverride();
   setupGodModeAutoEnable();
+  setupDebugLogging();
   setupDebugButtons();
   checkAutoEnableGodMode();
 }

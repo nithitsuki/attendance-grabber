@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="background: #fff; border-radius: 1rem; color: #000;">
+<html style="border-radius: 1rem;">
 
 <head>
   <meta charset="UTF-8">
@@ -7,40 +7,49 @@
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body id="popupBody">
   <h3>Amrita Attendance Fetcher</h3>
   <button id="dump">Get Attendance</button>
   <pre id="output" style="min-height: 0;"></pre>
   
-  <button id="override" style="display: none; background: black; color: white;">Enter God Mode</button>
+  <button id="override" style="display: none; background: #000; color: #FFD700; border: 1px solid #FFD700;">Enter God Mode</button>
   
   <div id="overrideOptions" style="display: none;">
-    <h4 style="margin: 10px 0 5px 0;">⚙️ Settings</h4>
-    <label style="display: block; margin: 5px 0;">
+    <button id="exitGodMode" style="margin-bottom: 15px; padding: 8px 16px; background: #FFD700; color: #000; border: none; font-weight: 600;">← Back to Normal Mode</button>
+    <h4 style="margin: 10px 0 8px 0; font-size: 14px;">Settings</h4>
+    <label style="display: block; margin: 4px 0; font-size: 13px;">
       <input type="checkbox" id="localhostOverride">
-      Use custom URL instead of sad.nithitsuki.com
+      Use custom URL
     </label>
-    <div style="margin: 5px 0 5px 20px;">
-      <label style="display: block; font-size: 12px;">
+    <div style="margin: 4px 0 4px 20px;">
+      <label style="display: block; font-size: 11px;">
         Custom URL:
-        <input type="text" id="customUrl" placeholder="http://localhost:3000/dashboard" style="width: 250px; padding: 2px;">
+        <input type="text" id="customUrl" placeholder="http://localhost:3000/dashboard" style="width: 230px; padding: 3px; font-size: 11px;">
       </label>
     </div>
-    <label style="display: block; margin: 5px 0;">
+    <label style="display: block; margin: 4px 0; font-size: 13px;">
       <input type="checkbox" id="godModeAutoEnable">
-      Enable God Mode by default
+      Auto-enable God Mode
+    </label>
+    <label style="display: block; margin: 4px 0; font-size: 13px;">
+      <input type="checkbox" id="debugLogging">
+      Debug logging
     </label>
     
-    <h4 style="margin: 15px 0 5px 0;">Debug Tools</h4>
-    <button id="debugCheckUsername" style="margin: 5px 0; padding: 5px 10px;">Check Current Username</button>
-    <button id="debugFetchUsername" style="margin: 5px 0; padding: 5px 10px;">Fetch Username from Portal</button>
-    <button id="debugResolveUsername" style="margin: 5px 0; padding: 5px 10px;">Resolve Username</button>
-    <button id="debugClearUsername" style="margin: 5px 0; padding: 5px 10px; background: #ff6b6b; color: white;">Reset Username to "Unknown User"</button>
-    <pre id="debugOutput" style="margin: 5px 0; padding: 5px; background: #f0f0f0; max-height: 200px; overflow-y: auto; font-size: 11px;"></pre>
+    <h4 style="margin: 15px 0 8px 0; font-size: 14px;">Debug Tools</h4>
+    <div class="debug-buttons">
+      <button id="debugCheckUsername" class="compact-btn">Check Username</button>
+      <button id="debugFetchUsername" class="compact-btn">Fetch from Portal</button>
+      <button id="debugResolveUsername" class="compact-btn">Resolve Username</button>
+      <button id="debugClearUsername" class="compact-btn" style="background: #ff6b6b; color: white;">Reset Username</button>
+    </div>
+    <pre id="debugOutput" style="margin: 8px 0 0 0; padding: 8px; background: #1a1a1a; color: #FFD700; max-height: 150px; overflow-y: auto; font-size: 10px; border: 1px solid #FFD700;"></pre>
   </div>
   
-  <p style="margin: 0; padding: 0;">perform the secret ritual to unseal the override protocol</p>
-  <p style="color: #fefefe; margin: 0; padding: 0;">up,up,down,down... the ancient code still holds.</p>
+  <div id="ritualText">
+    <p style="margin: 0; padding: 0; font-size: 11px;">perform the secret ritual to unseal the override protocol</p>
+    <p style="color: #fefefe; margin: 0; padding: 0; font-size: 11px;">up,up,down,down... the ancient code still holds.</p>
+  </div>
 
   <script type="module" src="popup-ui.js"></script>
   <script type="module" src="popup.js"></script>
