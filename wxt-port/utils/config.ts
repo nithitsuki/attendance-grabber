@@ -37,9 +37,10 @@ function getCurrentTermId(): number {
 }
 export const CONFIG: ExtensionConfig = {
   // Target website where attendance data will be sent
-  // Toggle between local development and production
-  TARGET_WEBSITE: "https://sad.nithitsuki.com/dashboard",
-  // TARGET_WEBSITE: "http://localhost:3000/dashboard", // Uncomment for local development
+  // Automatically switches between local development and production based on build mode
+  TARGET_WEBSITE: import.meta.env.DEV
+    ? "http://localhost:3000/dashboard"
+    : "https://sad.nithitsuki.com/dashboard",
 
   // Amrita University portal settings
   AMRITA_PORTAL: {

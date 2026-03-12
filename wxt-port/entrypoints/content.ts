@@ -8,8 +8,6 @@ import { initLogger } from '../utils/logger';
 export default defineContentScript({
   matches: [
     'https://students.amrita.edu/*',
-    'http://localhost/*', 
-    'http://127.0.0.1/*',
     'https://sad.nithitsuki.com/*'
   ],
   async main() {

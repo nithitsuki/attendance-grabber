@@ -7,22 +7,7 @@ import { browser } from 'wxt/browser';
 import { AttendanceUpdateRequest, AttendanceUpdateResponse, ExtensionEvents } from './types';
 import { dispatchExtensionEvent } from './event-dispatcher';
 import { resolveUsername } from './user-utils';
-
-/**
- * Get target website URL based on user preferences
- */
-async function getTargetWebsite(): Promise<string> {
-  try {
-    const result = await browser.storage.local.get(['localhostOverride', 'customUrl']);
-    
-    if (result.localhostOverride) {
-      return result.customUrl || 'http://localhost:3000/dashboard';
-    }
-    return 'https://sad.nithitsuki.com/dashboard';
-  } catch {
-    return 'https://sad.nithitsuki.com/dashboard';
-  }
-}
+import { CONFIG } from '../../utils/config';
 
 /**
  * Main attendance update handler
@@ -41,7 +26,7 @@ export async function handleAttendanceUpdate(): Promise<void> {
   });
 
   try {
-    const targetWebsite = await getTargetWebsite();
+    const targetWebsite = CONFIG.TARGET_WEBSITE;
     
     const response = await browser.runtime.sendMessage({
       action: 'getAttendance',

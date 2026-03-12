@@ -1,32 +1,11 @@
 /**
  * UI-specific functionality for the popup
- * Handles override mode, Konami code, and localhost forwarding
+ * Handles override mode, Konami code, and debug tools
  */
 
 // Konami code sequence
 const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
 let konamiCodePosition = 0;
-
-/**
- * Load localhost override preference from storage
- */
-async function loadLocalhostPreference() {
-  try {
-    const result = await browser.storage.local.get(['localhostOverride', 'customUrl']);
-    const checkbox = document.getElementById('localhostOverride');
-    const urlInput = document.getElementById('customUrl');
-    
-    if (checkbox) {
-      checkbox.checked = result.localhostOverride || false;
-    }
-    if (urlInput) {
-      urlInput.value = result.customUrl || 'http://localhost:3000/dashboard';
-      urlInput.disabled = !result.localhostOverride;
-    }
-  } catch (error) {
-    console.error('Error loading localhost preference:', error);
-  }
-}
 
 /**
  * Load god mode auto-enable preference from storage
@@ -55,58 +34,6 @@ async function saveGodModePreference(enabled) {
     console.log('God mode auto-enable preference saved:', enabled);
   } catch (error) {
     console.error('Error saving god mode preference:', error);
-  }
-}
-
-/**
- * Save localhost override preference to storage
- * @param {boolean} enabled - Whether localhost override is enabled
- */
-async function saveLocalhostPreference(enabled) {
-  try {
-    await browser.storage.local.set({ localhostOverride: enabled });
-    console.log('Localhost override preference saved:', enabled);
-    
-    // Enable/disable the custom URL input
-    const urlInput = document.getElementById('customUrl');
-    if (urlInput) {
-      urlInput.disabled = !enabled;
-    }
-  } catch (error) {
-    console.error('Error saving localhost preference:', error);
-  }
-}
-
-/**
- * Save custom URL preference to storage
- * @param {string} url - The custom URL
- */
-async function saveCustomUrl(url) {
-  try {
-    await browser.storage.local.set({ customUrl: url });
-    console.log('Custom URL saved:', url);
-  } catch (error) {
-    console.error('Error saving custom URL:', error);
-  }
-}
-
-/**
- * Get the target website URL based on localhost override setting
- * @returns {Promise<string>} The target website URL
- */
-async function getTargetWebsite() {
-  try {
-    const result = await browser.storage.local.get(['localhostOverride', 'customUrl']);
-    const useLocalhost = result.localhostOverride || false;
-    
-    if (useLocalhost) {
-      return result.customUrl || "http://localhost:3000/dashboard";
-    } else {
-      return "https://sad.nithitsuki.com/dashboard";
-    }
-  } catch (error) {
-    console.error('Error getting target website:', error);
-    return "https://sad.nithitsuki.com/dashboard"; // fallback to default
   }
 }
 
@@ -213,35 +140,6 @@ async function checkAutoEnableGodMode() {
     }
   } catch (error) {
     console.error('Error checking god mode auto-enable:', error);
-  }
-}
-
-/**
- * Setup localhost override functionality
- */
-function setupLocalhostOverride() {
-  const localhostCheckbox = document.getElementById('localhostOverride');
-  const urlInput = document.getElementById('customUrl');
-  
-  if (localhostCheckbox) {
-    // Load saved preference
-    loadLocalhostPreference();
-    
-    // Save preference when changed
-    localhostCheckbox.addEventListener('change', function () {
-      saveLocalhostPreference(this.checked);
-    });
-  }
-  
-  if (urlInput) {
-    // Save URL when changed (with debounce)
-    let timeout;
-    urlInput.addEventListener('input', function () {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        saveCustomUrl(this.value);
-      }, 500);
-    });
   }
 }
 
@@ -388,7 +286,6 @@ function initializePopupUI() {
   setupShareButton();
   setupOverrideButton();
   setupKonamiCode();
-  setupLocalhostOverride();
   setupGodModeAutoEnable();
   setupDebugLogging();
   setupDebugButtons();
@@ -472,12 +369,4 @@ function showInfoBox(message, isError = false) {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', initializePopupUI);
 
-// Export functions for use in other modules as both module exports and global
-export { getTargetWebsite, saveLocalhostPreference, loadLocalhostPreference };
 
-// Also make available globally for non-module access
-window.popupUI = {
-  getTargetWebsite,
-  saveLocalhostPreference,
-  loadLocalhostPreference
-};

@@ -63,8 +63,6 @@ After navigating to the dashboard, the extension injects the following keys into
 | Permission | Why it is needed |
 |---|---|
 | `activeTab` | Read the URL and content of the currently active tab to detect the attendance page |
-| `cookies` | Ensure the portal session remains active when the background script fetches the username |
-| `webNavigation` | Detect when the portal page has finished loading before injecting scripts |
 | `scripting` | Run the attendance-extraction and localStorage-injection functions inside the portal and dashboard pages |
 | `storage` | Temporarily buffer attendance data in `browser.storage.local` during transfer |
 | Host permission: `https://students.amrita.edu/*` | Access the Amrita portal to extract attendance |
