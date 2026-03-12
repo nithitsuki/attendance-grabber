@@ -1,6 +1,6 @@
 # Privacy Policy — Amrita Attendance Fetcher
 
-**Last updated: March 7, 2026**
+**Last updated: March 12, 2026**
 **Extension version: 6.0**
 
 ---
