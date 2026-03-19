@@ -5,13 +5,18 @@
 
 </div>
 
-
 A modern browser extension that streamlines attendance tracking for Amrita University students by automatically extracting attendance data from the university portal and presenting it through an enhanced dashboard experience.
+
+
+<div align="center">
 
 ## Installation
 
-[<img src="marketing/get-addon-buttons/firefox-button.svg" alt="firefoxget" height="31" width="88">](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/) [<img src="marketing/get-addon-buttons/edge-button.png" alt="edgeget" height="31">](https://microsoftedge.microsoft.com/addons/detail/amrita-attendance-fetcher/eeccbjbcoakpcknafgkaopfhlhckknnm)
- <!-- [<img src="marketing/get-addon-buttons/chrome-webstore-button.png" alt="chromget" height="31">]() -->
+[<img src="marketing/get-addon-buttons/firefox-button.svg" alt="Get it on Firefox Add-ons" height="48">](https://addons.mozilla.org/en-US/firefox/addon/amrita-attendance-fetcher/)
+[<img src="marketing/get-addon-buttons/edge-button.png" alt="Get it on Microsoft Edge Add-ons" height="48">](https://microsoftedge.microsoft.com/addons/detail/amrita-attendance-fetcher/eeccbjbcoakpcknafgkaopfhlhckknnm)
+[<img src="marketing/get-addon-buttons/chrome-webstore-button.png" alt="Get it on Chrome Web Store" height="48">](https://chromewebstore.google.com/detail/amrita-attendance-fetcher/ckgljenieoaihjnblblljojohgdpbbke?authuser=0&hl=en&pli=1)
+
+</div>
 
 ## Usage
 ### Quick Start
@@ -19,9 +24,11 @@ A modern browser extension that streamlines attendance tracking for Amrita Unive
 2. **Option A - Use Extension Popup**:
    - Click the extension icon in your toolbar
    - Click the **"[Get Attendance](marketing/popup.png)"** button
+   ![Get Attendance](marketing/popup.png)
 3. **Option B - Use Injected Button**:
    - Go to the [class attendance page](https://students.amrita.edu/client/class-attendance) on My amrita
-   - Click the **"Go to Dashboard!"** button that appears automatically ([pic of the button](marketing/button.png))
+   - Click the **"Go to Dashboard!"** button that appears automatically
+   ![pic of the button](marketing/button.png)
 4. **Option C - Use the sad.nithitsuki.com website**:
    - Visit [sad.nithitsuki.com](https://sad.nithitsuki.com)
    - Click on the **Red Text** (eg. Steve) to fetch your latest attendance data
